@@ -1,0 +1,26 @@
+[package]
+name = "network_initializer"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# drones
+ap2024_rustinpeace_nosounddrone = { git = "https://github.com/Rust-In-Peace-AP/No-Sound-Drone.git" }
+rust_do_it = { git = "https://github.com/RustDoIt/Drone.git" }
+rusty_drones = { git = "https://github.com/rusty-drone-2024/rusty-drone.git" }
+getdroned = { git = "https://github.com/GetDroned/Drone.git", features = ["log"] }
+dr_ones = { git = "https://github.com/Dr-Ones/drone" }
+rustafarian-drone = { git = "https://github.com/Rustafarian-Unitn/rustafarian-drone.git" }
+rusteze_drone = { git = "https://github.com/Rusteze-AP/drone.git", branch = "main" }
+drone_bettercalldrone = { git = "https://github.com/BetterCallDrone/drone_BetterCallDrone.git" }
+rolling_drone = { git = "https://github.com/giorebecchi/RollingDrone.git" }
+rust-roveri = { git = "https://github.com/RustRoveri/rust-roveri.git" }
+
+# dependencies
+common = { git = "https://github.com/Cpp-enjoyers/common.git" }
+toml = "0.8"
+crossbeam-channel = "0.5"
+flexi_logger = "0.29"
+log = "0.4"
+wg_2024 = { git = "https://github.com/WGL-2024/WGL_repo_2024.git", features = ["serialize"] }
+itertools = "0.14.0"

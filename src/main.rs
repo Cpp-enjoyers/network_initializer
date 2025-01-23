@@ -1,0 +1,118 @@
+#![warn(clippy::pedantic)]
+
+use ap2024_rustinpeace_nosounddrone::NoSoundDroneRIP;
+use crossbeam_channel::{Receiver, Sender};
+use dr_ones::Drone as DrDrone;
+use getdroned::GetDroned;
+use itertools::chain;
+use rolling_drone::RollingDrone;
+use rust_do_it::RustDoIt;
+use rust_roveri::RustRoveri;
+use rustafarian_drone::RustafarianDrone;
+use rusteze_drone::RustezeDrone;
+use rusty_drones::RustyDrone;
+use std::collections::HashMap;
+use std::fs;
+use wg_2024::config::Config;
+use wg_2024::config::{Client, Drone, Server};
+use wg_2024::controller::{DroneCommand, DroneEvent};
+use wg_2024::drone::Drone as DroneTrait;
+use wg_2024::network::NodeId;
+use wg_2024::packet::Packet;
+
+macro_rules! create_boxed {
+    ($type:ty) => {
+        |id: NodeId,
+         controller_send: Sender<DroneEvent>,
+         controller_recv: Receiver<DroneCommand>,
+         packet_recv: Receiver<Packet>,
+         packet_send: HashMap<NodeId, Sender<Packet>>,
+         pdr: f32|
+         -> Box<dyn DroneTrait> {
+            Box::new(<$type>::new(
+                id,
+                controller_send,
+                controller_recv,
+                packet_recv,
+                packet_send,
+                pdr,
+            ))
+        }
+    };
+}
+
+fn create_channels<'a, T>(
+    drones: &'a [Drone],
+    clients: &'a [Client],
+    servers: &'a [Server],
+) -> impl Iterator<Item = (u8, (Sender<T>, Receiver<T>))> + use<'a, T> {
+    chain![
+        drones
+            .iter()
+            .map(|d: &Drone| (d.id, crossbeam_channel::unbounded::<T>())),
+        clients
+            .iter()
+            .map(|c: &Client| (c.id, crossbeam_channel::unbounded::<T>())),
+        servers
+            .iter()
+            .map(|s: &Server| (s.id, crossbeam_channel::unbounded::<T>())),
+    ]
+}
+
+fn main() {
+    let v = [
+        create_boxed!(DrDrone),
+        create_boxed!(RustDoIt),
+        create_boxed!(RustRoveri),
+        create_boxed!(RollingDrone),
+        create_boxed!(RustafarianDrone),
+        create_boxed!(RustezeDrone),
+        create_boxed!(RustyDrone),
+        create_boxed!(GetDroned),
+        create_boxed!(NoSoundDroneRIP),
+    ];
+
+    let config_data: String = fs::read_to_string("config/config.toml").expect("Unable to read config file");
+    // having our structs implement the Deserialize trait allows us to use the toml::from_str function to deserialize the config file into each of them
+    let Config {
+        drone,
+        client,
+        server,
+    }: Config = toml::from_str(&config_data).expect("Unable to parse TOML");
+
+    // TODO modulation
+    let scl_events: HashMap<NodeId, (Sender<DroneEvent>, Receiver<DroneEvent>)> = drone
+        .iter()
+        .map(|d: &Drone| (d.id, crossbeam_channel::unbounded()))
+        .collect();
+
+    let scl_commands: HashMap<NodeId, (Sender<DroneCommand>, Receiver<DroneCommand>)> = drone
+        .iter()
+        .map(|d: &Drone| (d.id, crossbeam_channel::unbounded()))
+        .collect();
+
+    // TODO: channels for servers and clients
+
+    let channels: HashMap<NodeId, (Sender<Packet>, Receiver<Packet>)> =
+        create_channels(&drone, &client, &server).collect();
+
+    // spawn drones
+    for d in drone {
+        let nbrs: HashMap<NodeId, Sender<Packet>> = d
+            .connected_node_ids
+            .iter()
+            .map(|id: &NodeId| (*id, channels[id].0.clone()))
+            .collect();
+        let mut new_drone: Box<dyn DroneTrait> = v[usize::from(d.id) % v.len()](
+            d.id,
+            scl_events[&d.id].0.clone(),
+            scl_commands[&d.id].1.clone(),
+            channels[&d.id].1.clone(),
+            nbrs,
+            d.pdr,
+        );
+        std::thread::spawn(move || new_drone.run());
+    }
+
+    // TODO spawn client/server + start scl
+}
