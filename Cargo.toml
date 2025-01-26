@@ -18,6 +18,7 @@ rust-roveri = { git = "https://github.com/RustRoveri/rust-roveri.git" }
 
 # dependencies
 common = { git = "https://github.com/Cpp-enjoyers/common.git" }
+simulation_controller = { git = "https://github.com/Cpp-enjoyers/simulation-controller.git" }
 toml = "0.8"
 crossbeam-channel = "0.5"
 flexi_logger = "0.29"
