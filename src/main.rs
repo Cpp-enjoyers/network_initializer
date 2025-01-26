@@ -11,6 +11,7 @@ use rust_roveri::RustRoveri;
 use rustafarian_drone::RustafarianDrone;
 use rusteze_drone::RustezeDrone;
 use rusty_drones::RustyDrone;
+use simulation_controller::SimulationController;
 use std::collections::HashMap;
 use std::fs;
 use wg_2024::config::Config;
@@ -115,4 +116,7 @@ fn main() {
     }
 
     // TODO spawn client/server + start scl
+    let mut scl = SimulationController::new(0, HashMap::new(), HashMap::new(), HashMap::new());
+    // std::thread::spawn(move || scl.run()); // Apparently this cant be done because "EventLoop must be created on the main thread"
+    scl.run();
 }
