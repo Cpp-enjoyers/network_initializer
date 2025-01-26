@@ -1,6 +1,7 @@
 #![warn(clippy::pedantic)]
 
 use ap2024_rustinpeace_nosounddrone::NoSoundDroneRIP;
+use common::slc_commands::{ClientCommand, ClientEvent, ServerCommand, ServerEvent};
 use crossbeam_channel::{Receiver, Sender};
 use dr_ones::Drone as DrDrone;
 use getdroned::GetDroned;
@@ -93,6 +94,25 @@ fn main() {
         .collect();
 
     // TODO: channels for servers and clients
+    let scl_client_events: HashMap<NodeId, (Sender<ClientEvent>, Receiver<ClientEvent>)> = client
+        .iter()
+        .map(|c: &Client| (c.id, crossbeam_channel::unbounded()))
+        .collect();
+
+    let scl_client_commands: HashMap<NodeId, (Sender<ClientCommand>, Receiver<ClientCommand>)> = client
+        .iter()
+        .map(|c: &Client| (c.id, crossbeam_channel::unbounded()))
+        .collect();
+
+    let scl_server_events: HashMap<NodeId, (Sender<ServerEvent>, Receiver<ServerEvent>)> = server
+        .iter()
+        .map(|s: &Server| (s.id, crossbeam_channel::unbounded()))
+        .collect();
+
+    let scl_server_commands: HashMap<NodeId, (Sender<ServerCommand>, Receiver<ServerCommand>)> = server
+        .iter()
+        .map(|s: &Server| (s.id, crossbeam_channel::unbounded()))
+        .collect();
 
     let channels: HashMap<NodeId, (Sender<Packet>, Receiver<Packet>)> =
         create_channels(&drone, &client, &server).collect();
