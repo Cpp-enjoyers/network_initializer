@@ -99,20 +99,22 @@ fn main() {
         .map(|c: &Client| (c.id, crossbeam_channel::unbounded()))
         .collect();
 
-    let scl_client_commands: HashMap<NodeId, (Sender<ClientCommand>, Receiver<ClientCommand>)> = client
-        .iter()
-        .map(|c: &Client| (c.id, crossbeam_channel::unbounded()))
-        .collect();
+    let scl_client_commands: HashMap<NodeId, (Sender<ClientCommand>, Receiver<ClientCommand>)> =
+        client
+            .iter()
+            .map(|c: &Client| (c.id, crossbeam_channel::unbounded()))
+            .collect();
 
     let scl_server_events: HashMap<NodeId, (Sender<ServerEvent>, Receiver<ServerEvent>)> = server
         .iter()
         .map(|s: &Server| (s.id, crossbeam_channel::unbounded()))
         .collect();
 
-    let scl_server_commands: HashMap<NodeId, (Sender<ServerCommand>, Receiver<ServerCommand>)> = server
-        .iter()
-        .map(|s: &Server| (s.id, crossbeam_channel::unbounded()))
-        .collect();
+    let scl_server_commands: HashMap<NodeId, (Sender<ServerCommand>, Receiver<ServerCommand>)> =
+        server
+            .iter()
+            .map(|s: &Server| (s.id, crossbeam_channel::unbounded()))
+            .collect();
 
     let channels: HashMap<NodeId, (Sender<Packet>, Receiver<Packet>)> =
         create_channels(&drone, &client, &server).collect();
@@ -136,19 +138,45 @@ fn main() {
     }
 
     // TODO spawn client/server + start scl
-    let mut scl_drones_channels: HashMap<NodeId, (Sender<DroneCommand>, Receiver<DroneEvent>)> = HashMap::new();
-    let mut scl_clients_channels: HashMap<NodeId, (Sender<ClientCommand>, Receiver<ClientEvent>)> = HashMap::new();
-    let mut scl_servers_channels: HashMap<NodeId, (Sender<ServerCommand>, Receiver<ServerEvent>)> = HashMap::new();
+    let mut scl_drones_channels: HashMap<NodeId, (Sender<DroneCommand>, Receiver<DroneEvent>)> =
+        HashMap::new();
+    let mut scl_clients_channels: HashMap<NodeId, (Sender<ClientCommand>, Receiver<ClientEvent>)> =
+        HashMap::new();
+    let mut scl_servers_channels: HashMap<NodeId, (Sender<ServerCommand>, Receiver<ServerEvent>)> =
+        HashMap::new();
     for d in &drone {
-        scl_drones_channels.insert(d.id, (scl_commands[&d.id].0.clone(), scl_events[&d.id].1.clone()));
+        scl_drones_channels.insert(
+            d.id,
+            (scl_commands[&d.id].0.clone(), scl_events[&d.id].1.clone()),
+        );
     }
     for c in &client {
-        scl_clients_channels.insert(c.id, (scl_client_commands[&c.id].0.clone(), scl_client_events[&c.id].1.clone()));
+        scl_clients_channels.insert(
+            c.id,
+            (
+                scl_client_commands[&c.id].0.clone(),
+                scl_client_events[&c.id].1.clone(),
+            ),
+        );
     }
     for s in &server {
-        scl_servers_channels.insert(s.id, (scl_server_commands[&s.id].0.clone(), scl_server_events[&s.id].1.clone()));
+        scl_servers_channels.insert(
+            s.id,
+            (
+                scl_server_commands[&s.id].0.clone(),
+                scl_server_events[&s.id].1.clone(),
+            ),
+        );
     }
-    let mut scl = SimulationController::new(0, scl_drones_channels, scl_clients_channels, scl_servers_channels);
+    let mut scl = SimulationController::new(
+        0,
+        scl_drones_channels,
+        scl_clients_channels,
+        scl_servers_channels,
+        drone.clone(),
+        client.clone(),
+        server.clone(),
+    );
     // std::thread::spawn(move || scl.run()); // Apparently this cant be done because "EventLoop must be created on the main thread"
     scl.run();
 }
