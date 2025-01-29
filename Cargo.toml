@@ -25,3 +25,5 @@ flexi_logger = "0.29"
 log = "0.4"
 wg_2024 = { git = "https://github.com/WGL-2024/WGL_repo_2024.git", features = ["serialize"] }
 itertools = "0.14.0"
+web_client = {git = "https://github.com/Cpp-enjoyers/web_client"}
+servers = {git = "https://github.com/Cpp-enjoyers/Text_Media_server"}

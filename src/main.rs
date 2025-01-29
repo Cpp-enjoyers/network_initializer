@@ -2,6 +2,7 @@
 
 use ap2024_rustinpeace_nosounddrone::NoSoundDroneRIP;
 use common::slc_commands::{ClientCommand, ClientEvent, ServerCommand, ServerEvent};
+use common::{Client as ClientTrait, Server as ServerTrait};
 use crossbeam_channel::{Receiver, Sender};
 use dr_ones::Drone as DrDrone;
 use getdroned::GetDroned;
@@ -74,7 +75,8 @@ fn main() {
         create_boxed!(NoSoundDroneRIP),
     ];
 
-    let config_data: String = fs::read_to_string("config/config.toml").expect("Unable to read config file");
+    let config_data: String =
+        fs::read_to_string("config/config.toml").expect("Unable to read config file");
     // having our structs implement the Deserialize trait allows us to use the toml::from_str function to deserialize the config file into each of them
     let Config {
         drone,
@@ -168,6 +170,42 @@ fn main() {
             ),
         );
     }
+
+    // spawn clients
+    for c in &client {
+        let nbrs: HashMap<NodeId, Sender<Packet>> = c
+            .connected_drone_ids
+            .iter()
+            .map(|id: &NodeId| (*id, channels[id].0.clone()))
+            .collect();
+        let mut new_client = web_client::WebBrowser::new(
+            c.id,
+            scl_client_events[&c.id].0.clone(),
+            scl_client_commands[&c.id].1.clone(),
+            channels[&c.id].1.clone(),
+            nbrs,
+        );
+        std::thread::spawn(move || new_client.run());
+    }
+
+    // spawn servers
+    for s in &server {
+        let nbrs: HashMap<NodeId, Sender<Packet>> = s
+            .connected_drone_ids
+            .iter()
+            .map(|id: &NodeId| (*id, channels[id].0.clone()))
+            .collect();
+        let mut new_server = servers::GenericServer::new(
+            s.id,
+            scl_server_events[&s.id].0.clone(),
+            scl_server_commands[&s.id].1.clone(),
+            channels[&s.id].1.clone(),
+            nbrs,
+        );
+        std::thread::spawn(move || new_server.run());
+    }
+
+
     let mut scl = SimulationController::new(
         0,
         scl_drones_channels,
