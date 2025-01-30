@@ -140,16 +140,21 @@ fn main() {
     }
 
     // TODO spawn client/server + start scl
-    let mut scl_drones_channels: HashMap<NodeId, (Sender<DroneCommand>, Receiver<DroneEvent>)> =
+    let mut scl_drones_channels: HashMap<NodeId, (Sender<DroneCommand>, Receiver<DroneEvent>, Sender<Packet>, Receiver<Packet>)> =
         HashMap::new();
-    let mut scl_clients_channels: HashMap<NodeId, (Sender<ClientCommand>, Receiver<ClientEvent>)> =
+    let mut scl_clients_channels: HashMap<NodeId, (Sender<ClientCommand>, Receiver<ClientEvent>, Sender<Packet>, Receiver<Packet>)> =
         HashMap::new();
-    let mut scl_servers_channels: HashMap<NodeId, (Sender<ServerCommand>, Receiver<ServerEvent>)> =
+    let mut scl_servers_channels: HashMap<NodeId, (Sender<ServerCommand>, Receiver<ServerEvent>, Sender<Packet>, Receiver<Packet>)> =
         HashMap::new();
     for d in &drone {
         scl_drones_channels.insert(
             d.id,
-            (scl_commands[&d.id].0.clone(), scl_events[&d.id].1.clone()),
+            (
+                scl_commands[&d.id].0.clone(),
+                scl_events[&d.id].1.clone(),
+                channels[&d.id].0.clone(),
+                channels[&d.id].1.clone()
+            ),
         );
     }
     for c in &client {
@@ -158,6 +163,8 @@ fn main() {
             (
                 scl_client_commands[&c.id].0.clone(),
                 scl_client_events[&c.id].1.clone(),
+                channels[&c.id].0.clone(),
+                channels[&c.id].1.clone(),
             ),
         );
     }
@@ -167,6 +174,8 @@ fn main() {
             (
                 scl_server_commands[&s.id].0.clone(),
                 scl_server_events[&s.id].1.clone(),
+                channels[&s.id].0.clone(),
+                channels[&s.id].1.clone(),
             ),
         );
     }
