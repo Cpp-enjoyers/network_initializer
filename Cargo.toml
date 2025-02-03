@@ -16,6 +16,8 @@ drone_bettercalldrone = { git = "https://github.com/BetterCallDrone/drone_Better
 rolling_drone = { git = "https://github.com/giorebecchi/RollingDrone.git" }
 rust-roveri = { git = "https://github.com/RustRoveri/rust-roveri.git" }
 
+ap2024_unitn_cppenjoyers_drone = { git = "https://github.com/Cpp-enjoyers/drone.git" }
+
 # dependencies
 common = { git = "https://github.com/Cpp-enjoyers/common.git" }
 simulation_controller = { git = "https://github.com/Cpp-enjoyers/simulation-controller.git" }
@@ -23,6 +25,7 @@ toml = "0.8"
 crossbeam-channel = "0.5"
 flexi_logger = "0.29"
 log = "0.4"
+env_logger = "0.11"
 wg_2024 = { git = "https://github.com/WGL-2024/WGL_repo_2024.git", features = ["serialize"] }
 itertools = "0.14.0"
 web_client = {git = "https://github.com/Cpp-enjoyers/web_client"}

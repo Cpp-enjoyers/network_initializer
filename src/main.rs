@@ -1,7 +1,7 @@
 #![warn(clippy::pedantic)]
 
 use ap2024_rustinpeace_nosounddrone::NoSoundDroneRIP;
-use common::slc_commands::{ClientCommand, ClientEvent, ServerCommand, ServerEvent};
+use common::slc_commands::{ChatClientCommand, ChatClientEvent, ServerCommand, ServerEvent, WebClientCommand, WebClientEvent};
 use common::{Client as ClientTrait, Server as ServerTrait};
 use crossbeam_channel::{Receiver, Sender};
 use dr_ones::Drone as DrDrone;
@@ -13,7 +13,6 @@ use rust_roveri::RustRoveri;
 use rustafarian_drone::RustafarianDrone;
 use rusteze_drone::RustezeDrone;
 use rusty_drones::RustyDrone;
-use simulation_controller::SimulationController;
 use std::collections::HashMap;
 use std::fs;
 use wg_2024::config::Config;
@@ -22,6 +21,8 @@ use wg_2024::controller::{DroneCommand, DroneEvent};
 use wg_2024::drone::Drone as DroneTrait;
 use wg_2024::network::NodeId;
 use wg_2024::packet::Packet;
+use std::env;
+use ap2024_unitn_cppenjoyers_drone::CppEnjoyersDrone;
 
 macro_rules! create_boxed {
     ($type:ty) => {
@@ -63,6 +64,8 @@ fn create_channels<'a, T>(
 }
 
 fn main() {
+    env::set_var("RUST_LOG", "info");
+    let _ = env_logger::try_init();
     let v = [
         create_boxed!(DrDrone),
         create_boxed!(RustDoIt),
@@ -73,10 +76,11 @@ fn main() {
         create_boxed!(RustyDrone),
         create_boxed!(GetDroned),
         create_boxed!(NoSoundDroneRIP),
+        create_boxed!(CppEnjoyersDrone),
     ];
 
     let config_data: String =
-        fs::read_to_string("config/config.toml").expect("Unable to read config file");
+        fs::read_to_string("config/test_config.toml").expect("Unable to read config file");
     // having our structs implement the Deserialize trait allows us to use the toml::from_str function to deserialize the config file into each of them
     let Config {
         drone,
@@ -96,12 +100,12 @@ fn main() {
         .collect();
 
     // TODO: channels for servers and clients
-    let scl_client_events: HashMap<NodeId, (Sender<ClientEvent>, Receiver<ClientEvent>)> = client
+    let scl_web_client_events: HashMap<NodeId, (Sender<WebClientEvent>, Receiver<WebClientEvent>)> = client
         .iter()
         .map(|c: &Client| (c.id, crossbeam_channel::unbounded()))
         .collect();
 
-    let scl_client_commands: HashMap<NodeId, (Sender<ClientCommand>, Receiver<ClientCommand>)> =
+    let scl_web_client_commands: HashMap<NodeId, (Sender<WebClientCommand>, Receiver<WebClientCommand>)> =
         client
             .iter()
             .map(|c: &Client| (c.id, crossbeam_channel::unbounded()))
@@ -142,7 +146,9 @@ fn main() {
     // TODO spawn client/server + start scl
     let mut scl_drones_channels: HashMap<NodeId, (Sender<DroneCommand>, Receiver<DroneEvent>, Sender<Packet>, Receiver<Packet>)> =
         HashMap::new();
-    let mut scl_clients_channels: HashMap<NodeId, (Sender<ClientCommand>, Receiver<ClientEvent>, Sender<Packet>, Receiver<Packet>)> =
+    let mut scl_web_clients_channels: HashMap<NodeId, (Sender<WebClientCommand>, Receiver<WebClientEvent>, Sender<Packet>, Receiver<Packet>)> =
+        HashMap::new();
+    let mut scl_chat_clients_channels: HashMap<NodeId, (Sender<ChatClientCommand>, Receiver<ChatClientEvent>, Sender<Packet>, Receiver<Packet>)> =
         HashMap::new();
     let mut scl_servers_channels: HashMap<NodeId, (Sender<ServerCommand>, Receiver<ServerEvent>, Sender<Packet>, Receiver<Packet>)> =
         HashMap::new();
@@ -158,11 +164,11 @@ fn main() {
         );
     }
     for c in &client {
-        scl_clients_channels.insert(
+        scl_web_clients_channels.insert(
             c.id,
             (
-                scl_client_commands[&c.id].0.clone(),
-                scl_client_events[&c.id].1.clone(),
+                scl_web_client_commands[&c.id].0.clone(),
+                scl_web_client_events[&c.id].1.clone(),
                 channels[&c.id].0.clone(),
                 channels[&c.id].1.clone(),
             ),
@@ -189,8 +195,8 @@ fn main() {
             .collect();
         let mut new_client = web_client::WebBrowser::new(
             c.id,
-            scl_client_events[&c.id].0.clone(),
-            scl_client_commands[&c.id].1.clone(),
+            scl_web_client_events[&c.id].0.clone(),
+            scl_web_client_commands[&c.id].1.clone(),
             channels[&c.id].1.clone(),
             nbrs,
         );
@@ -198,32 +204,58 @@ fn main() {
     }
 
     // spawn servers
-    for s in &server {
-        let nbrs: HashMap<NodeId, Sender<Packet>> = s
-            .connected_drone_ids
-            .iter()
-            .map(|id: &NodeId| (*id, channels[id].0.clone()))
-            .collect();
-        let mut new_server = servers::GenericServer::new(
-            s.id,
-            scl_server_events[&s.id].0.clone(),
-            scl_server_commands[&s.id].1.clone(),
-            channels[&s.id].1.clone(),
-            nbrs,
-        );
-        std::thread::spawn(move || new_server.run());
+    for (idx, s) in server.iter().enumerate() {
+        if idx == 0 {
+            let nbrs: HashMap<NodeId, Sender<Packet>> = s
+                .connected_drone_ids
+                .iter()
+                .map(|id: &NodeId| (*id, channels[id].0.clone()))
+                .collect();
+            let mut new_server = servers::servers::TextServer::new(
+                s.id,
+                scl_server_events[&s.id].0.clone(),
+                scl_server_commands[&s.id].1.clone(),
+                channels[&s.id].1.clone(),
+                nbrs,
+            );
+            std::thread::spawn(move || new_server.run());
+        } else {
+            let nbrs: HashMap<NodeId, Sender<Packet>> = s
+                .connected_drone_ids
+                .iter()
+                .map(|id: &NodeId| (*id, channels[id].0.clone()))
+                .collect();
+            let mut new_server = servers::servers::MediaServer::new(
+                s.id,
+                scl_server_events[&s.id].0.clone(),
+                scl_server_commands[&s.id].1.clone(),
+                channels[&s.id].1.clone(),
+                nbrs,
+            );
+            std::thread::spawn(move || new_server.run());
+        }
     }
 
 
-    let mut scl = SimulationController::new(
+    // let mut scl = SimulationController::new(
+    //     0,
+    //     scl_drones_channels,
+    //     scl_clients_channels,
+    //     scl_servers_channels,
+    //     drone.clone(),
+    //     client.clone(),
+    //     server.clone(),
+    // );
+    // std::thread::spawn(move || scl.run()); // Apparently this cant be done because "EventLoop must be created on the main thread"
+    // scl.run();
+    simulation_controller::run(
         0,
         scl_drones_channels,
-        scl_clients_channels,
+        scl_web_clients_channels,
+        scl_chat_clients_channels,
         scl_servers_channels,
         drone.clone(),
         client.clone(),
         server.clone(),
     );
-    // std::thread::spawn(move || scl.run()); // Apparently this cant be done because "EventLoop must be created on the main thread"
-    scl.run();
 }
