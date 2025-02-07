@@ -2,6 +2,7 @@
 
 use ap2024_rustinpeace_nosounddrone::NoSoundDroneRIP;
 use common::slc_commands::{ChatClientCommand, ChatClientEvent, ServerCommand, ServerEvent, WebClientCommand, WebClientEvent};
+use web_client::web_client::WebBrowser;
 use common::{Client as ClientTrait, Server as ServerTrait};
 use crossbeam_channel::{Receiver, Sender};
 use dr_ones::Drone as DrDrone;
@@ -257,7 +258,7 @@ fn main() {
             .iter()
             .map(|id: &NodeId| (*id, channels[id].0.clone()))
             .collect();
-        let mut new_client = web_client::WebBrowser::new(
+        let mut new_client = web_client::web_client::WebBrowser::new(
             c.id,
             scl_web_client_events[&c.id].0.clone(),
             scl_web_client_commands[&c.id].1.clone(),
@@ -313,7 +314,6 @@ fn main() {
     // std::thread::spawn(move || scl.run()); // Apparently this cant be done because "EventLoop must be created on the main thread"
     // scl.run();
     simulation_controller::run(
-        0,
         scl_drones_channels,
         scl_web_clients_channels,
         scl_chat_clients_channels,

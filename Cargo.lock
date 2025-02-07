@@ -257,7 +257,7 @@ dependencies = [
 [[package]]
 name = "ap2024_unitn_cppenjoyers_drone"
 version = "0.9.0"
-source = "git+https://github.com/Cpp-enjoyers/drone.git#5c13f78fe4b8edb02bff81d340bc080f3e7ca4ce"
+source = "git+https://github.com/Cpp-enjoyers/drone.git#d328f66bd3a12257b89de7c64cd09f2a49c605c3"
 dependencies = [
  "crossbeam-channel",
  "log",
@@ -707,9 +707,9 @@ dependencies = [
 
 [[package]]
 name = "cc"
-version = "1.2.11"
+version = "1.2.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e4730490333d58093109dc02c23174c3f4d490998c3fed3cc8e82d57afedb9cf"
+checksum = "755717a7de9ec452bf7f3f1a3099085deabd7f2962b861dae91ecd7a365903d2"
 dependencies = [
  "jobserver",
  "libc",
@@ -811,7 +811,7 @@ dependencies = [
 [[package]]
 name = "common"
 version = "0.1.0"
-source = "git+https://github.com/Cpp-enjoyers/common.git#714b85769b07fc4fafd3ebd0cfc2ba19c04951da"
+source = "git+https://github.com/Cpp-enjoyers/common.git#b834908c79f09b81d22c31a190247c7264498cff"
 dependencies = [
  "bincode",
  "crossbeam-channel",
@@ -1011,9 +1011,9 @@ checksum = "0e60eed09d8c01d3cee5b7d30acb059b76614c918fa0f992e0dd6eeb10daad6f"
 
 [[package]]
 name = "derive_more"
-version = "0.99.18"
+version = "0.99.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5f33878137e4dafd7fa914ad4e259e18a4e8e532b9617a2d0150262bf53abfce"
+checksum = "3da29a38df43d6f156149c9b43ded5e018ddff2a855cf2cfd62e8cd7d079c69f"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1080,7 +1080,7 @@ checksum = "f25c0e292a7ca6d6498557ff1df68f32c99850012b6ea401cf8daf771f22ff53"
 [[package]]
 name = "dr_ones"
 version = "0.1.0"
-source = "git+https://github.com/Dr-Ones/drone#5252075546be656b3866fec55a4d3a9054c09015"
+source = "git+https://github.com/Dr-Ones/drone#810a4409d02d1b3e58ffe67861ce9931e5a095e1"
 dependencies = [
  "crossbeam-channel",
  "network_node",
@@ -1942,16 +1942,14 @@ dependencies = [
 
 [[package]]
 name = "html5ever"
-version = "0.29.0"
+version = "0.29.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2e15626aaf9c351bc696217cbe29cb9b5e86c43f8a46b5e2f5c6c5cf7cb904ce"
+checksum = "3b7410cae13cbc75623c98ac4cbfd1f0bedddf3227afc24f370cf0f50a44a11c"
 dependencies = [
  "log",
  "mac",
  "markup5ever",
- "proc-macro2",
- "quote",
- "syn",
+ "match_token",
 ]
 
 [[package]]
@@ -2405,9 +2403,9 @@ dependencies = [
 
 [[package]]
 name = "markup5ever"
-version = "0.14.0"
+version = "0.14.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "82c88c6129bd24319e62a0359cb6b958fa7e8be6e19bb1663bc396b90883aca5"
+checksum = "c7a7213d12e1864c0f002f52c2923d4556935a43dec5e71355c2760e0f6e7a18"
 dependencies = [
  "log",
  "phf",
@@ -2415,6 +2413,17 @@ dependencies = [
  "string_cache",
  "string_cache_codegen",
  "tendril",
+]
+
+[[package]]
+name = "match_token"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "88a9689d8d44bf9964484516275f5cd4c9b59457a6940c1d5d0ecbb94510a36b"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
 ]
 
 [[package]]
@@ -2602,8 +2611,9 @@ dependencies = [
 [[package]]
 name = "network_node"
 version = "0.1.0"
-source = "git+https://github.com/Dr-Ones/common.git#cd144f62ffb1660a29f3cdeb2ce5653fb3c1f313"
+source = "git+https://github.com/Dr-Ones/common.git#b2bcd21bacb5099e7f75dd8dea5303f20568c4e0"
 dependencies = [
+ "chrono",
  "crossbeam-channel",
  "once_cell",
  "rand 0.8.5",
@@ -2898,9 +2908,9 @@ dependencies = [
 
 [[package]]
 name = "once_cell"
-version = "1.20.2"
+version = "1.20.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1261fe7e33c73b354eab43b1273a57c8f967d0391e80353e51f764ac02cf6775"
+checksum = "945462a4b81e43c4e3ba96bd7b49d834c6f61198356aa858733bc4acf3cbe62e"
 
 [[package]]
 name = "orbclient"
@@ -3224,7 +3234,7 @@ checksum = "3779b94aeb87e8bd4e834cee3650289ee9e0d5677f976ecdb6d219e5f4f6cd94"
 dependencies = [
  "rand_chacha 0.9.0",
  "rand_core 0.9.0",
- "zerocopy 0.8.14",
+ "zerocopy 0.8.17",
 ]
 
 [[package]]
@@ -3263,7 +3273,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b08f3c9802962f7e1b25113931d94f43ed9725bebc59db9d0c3e9a23b67e15ff"
 dependencies = [
  "getrandom 0.3.1",
- "zerocopy 0.8.14",
+ "zerocopy 0.8.17",
 ]
 
 [[package]]
@@ -3350,7 +3360,7 @@ dependencies = [
 [[package]]
 name = "rust-roveri"
 version = "0.1.0"
-source = "git+https://github.com/RustRoveri/rust-roveri.git#eee9ce6c14b262f20bc1d7c18a60deb1f367d5ad"
+source = "git+https://github.com/RustRoveri/rust-roveri.git#2bababfeb0fb77f89f69363ddf6c2c2774ab1915"
 dependencies = [
  "bit-set",
  "crossbeam-channel",
@@ -3362,7 +3372,7 @@ dependencies = [
 [[package]]
 name = "rust_do_it"
 version = "0.1.0"
-source = "git+https://github.com/RustDoIt/Drone.git#cd8367ba4ed6546dabf15e5eecdc3d40c01bc9c0"
+source = "git+https://github.com/RustDoIt/Drone.git#844f691564b98ad5f7fe665bd84ca35032c2dda1"
 dependencies = [
  "crossbeam-channel",
  "env_logger 0.11.6",
@@ -3587,7 +3597,7 @@ dependencies = [
 [[package]]
 name = "servers"
 version = "0.1.0"
-source = "git+https://github.com/Cpp-enjoyers/Text_Media_server#6b834f41cda08a93ee38df7b6e90087cd8de7b1b"
+source = "git+https://github.com/Cpp-enjoyers/Text_Media_server#0dc8a1cc41e8cb87ffd17170b7464ff9a712c3c5"
 dependencies = [
  "ap2024_unitn_cppenjoyers_drone",
  "bincode",
@@ -3645,7 +3655,7 @@ checksum = "d66dc143e6b11c1eddc06d5c423cfc97062865baf299914ab64caa38182078fe"
 [[package]]
 name = "simulation_controller"
 version = "0.1.0"
-source = "git+https://github.com/Cpp-enjoyers/simulation-controller.git#a3dc42ba7c131137900810733ca057f56873efb4"
+source = "git+https://github.com/Cpp-enjoyers/simulation-controller.git#55a49677d2382da17b4ec7691562c09aad4da9f5"
 dependencies = [
  "common",
  "crossbeam-channel",
@@ -3989,9 +3999,9 @@ dependencies = [
 
 [[package]]
 name = "toml"
-version = "0.8.19"
+version = "0.8.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a1ed1f98e3fdc28d6d910e6737ae6ab1a93bf1985935a1193e68f93eeb68d24e"
+checksum = "cd87a5cdd6ffab733b2f74bc4fd7ee5fff6634124999ac278c35fc78c6120148"
 dependencies = [
  "serde",
  "serde_spanned",
@@ -4459,14 +4469,14 @@ dependencies = [
 [[package]]
 name = "web_client"
 version = "0.1.0"
-source = "git+https://github.com/Cpp-enjoyers/web_client#f551419b4572377db634e8a0ba3decfc3167b8b1"
+source = "git+https://github.com/Cpp-enjoyers/web_client#2dca39939c296f39b475009a513d02c71a94b2c1"
 dependencies = [
- "ap2024_unitn_cppenjoyers_drone",
  "bincode",
  "common",
  "compression",
  "crossbeam-channel",
  "itertools",
+ "log",
  "petgraph 0.7.1",
  "scraper",
  "wg_2024",
@@ -4977,9 +4987,9 @@ checksum = "589f6da84c646204747d1270a2a5661ea66ed1cced2631d546fdfb155959f9ec"
 
 [[package]]
 name = "winit"
-version = "0.30.8"
+version = "0.30.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f5d74280aabb958072864bff6cfbcf9025cf8bfacdde5e32b5e12920ef703b0f"
+checksum = "a809eacf18c8eca8b6635091543f02a5a06ddf3dad846398795460e6e0ae3cc0"
 dependencies = [
  "ahash",
  "android-activity",
@@ -5029,9 +5039,9 @@ dependencies = [
 
 [[package]]
 name = "winnow"
-version = "0.7.0"
+version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7e49d2d35d3fad69b39b94139037ecfb4f359f08958b9c11e7315ce770462419"
+checksum = "86e376c75f4f43f44db463cf729e0d3acbf954d13e22c51e26e4c264b4ab545f"
 dependencies = [
  "memchr",
 ]
@@ -5265,11 +5275,11 @@ dependencies = [
 
 [[package]]
 name = "zerocopy"
-version = "0.8.14"
+version = "0.8.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a367f292d93d4eab890745e75a778da40909cab4d6ff8173693812f79c4a2468"
+checksum = "aa91407dacce3a68c56de03abe2760159582b846c6a4acd2f456618087f12713"
 dependencies = [
- "zerocopy-derive 0.8.14",
+ "zerocopy-derive 0.8.17",
 ]
 
 [[package]]
@@ -5285,9 +5295,9 @@ dependencies = [
 
 [[package]]
 name = "zerocopy-derive"
-version = "0.8.14"
+version = "0.8.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d3931cb58c62c13adec22e38686b559c86a30565e16ad6e8510a337cedc611e1"
+checksum = "06718a168365cad3d5ff0bb133aad346959a2074bd4a85c121255a11304a8626"
 dependencies = [
  "proc-macro2",
  "quote",
