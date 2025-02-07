@@ -301,18 +301,6 @@ fn main() {
         }
     }
 
-
-    // let mut scl = SimulationController::new(
-    //     0,
-    //     scl_drones_channels,
-    //     scl_clients_channels,
-    //     scl_servers_channels,
-    //     drone.clone(),
-    //     client.clone(),
-    //     server.clone(),
-    // );
-    // std::thread::spawn(move || scl.run()); // Apparently this cant be done because "EventLoop must be created on the main thread"
-    // scl.run();
     simulation_controller::run(
         scl_drones_channels,
         scl_web_clients_channels,
