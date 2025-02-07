@@ -2595,6 +2595,7 @@ dependencies = [
  "getdroned",
  "itertools",
  "log",
+ "petgraph 0.7.1",
  "rolling_drone",
  "rust-roveri",
  "rust_do_it",

@@ -2,6 +2,7 @@
 
 use ap2024_rustinpeace_nosounddrone::NoSoundDroneRIP;
 use common::slc_commands::{ChatClientCommand, ChatClientEvent, ServerCommand, ServerEvent, WebClientCommand, WebClientEvent};
+use petgraph::prelude::DiGraphMap;
 use web_client::web_client::WebBrowser;
 use common::{Client as ClientTrait, Server as ServerTrait};
 use crossbeam_channel::{Receiver, Sender};
@@ -15,7 +16,7 @@ use rustafarian_drone::RustafarianDrone;
 use rusteze_drone::RustezeDrone;
 use rusty_drones::RustyDrone;
 use drone_bettercalldrone::BetterCallDrone;
-use std::collections::HashMap;
+use std::collections::{HashMap, VecDeque};
 use std::fs;
 use wg_2024::config::Config;
 use wg_2024::config::{Client, Drone, Server};
@@ -25,6 +26,7 @@ use wg_2024::network::NodeId;
 use wg_2024::packet::Packet;
 use std::env;
 use ap2024_unitn_cppenjoyers_drone::CppEnjoyersDrone;
+// use chat_common;
 
 #[cfg(test)]
 mod test;
@@ -101,6 +103,70 @@ fn check_server_connections(servers: &Vec<Server>, drones_id: &Vec<NodeId>) -> b
     )
 }
 
+fn check_bidirectional_and_connected(drones: &Vec<Drone>, clients: &Vec<Client>, servers: &Vec<Server>) -> bool{
+    let mut graph = DiGraphMap::new();
+
+    for drone in drones{
+        for to in &drone.connected_node_ids{
+            graph.add_edge(drone.id, *to, 0);
+        }
+    }
+    for client in clients{
+        for to in &client.connected_drone_ids{
+            graph.add_edge(client.id, *to, 0);
+        }
+    }
+    for server in servers{
+        for to in &server.connected_drone_ids{
+            graph.add_edge(server.id, *to, 0);
+        }
+    }
+
+    let mut out = vec![drones[0].id];
+    let mut queue: VecDeque<(u8, u8)> = VecDeque::new();
+    for conn in &drones[0].connected_node_ids{
+        queue.push_back((drones[0].id, *conn));
+    }
+
+    while let Some((parent, next_id)) = queue.pop_front() {
+        if out.contains(&next_id){
+            continue;
+        }
+        if let Some(next_drone) = drones.iter().find(|d|d.id == next_id){
+            if !next_drone.connected_node_ids.contains(&parent){
+                return false;
+            }
+            out.push(next_drone.id);
+            for conn in &next_drone.connected_node_ids{
+                queue.push_back((next_drone.id, *conn));
+            }
+        }
+        else if let Some(next_client) = clients.iter().find(|c|c.id == next_id){
+            if !next_client.connected_drone_ids.contains(&parent){
+                return false;
+            }
+            out.push(next_client.id);
+            for conn in &next_client.connected_drone_ids{
+                queue.push_back((next_client.id, *conn));
+            }
+        }
+        else if let Some(next_server) = servers.iter().find(|c|c.id == next_id){
+            if !next_server.connected_drone_ids.contains(&parent){
+                return false;
+            }
+            out.push(next_server.id);
+            for conn in &next_server.connected_drone_ids{
+                queue.push_back((next_server.id, *conn));
+            }
+        }
+        else {
+            unreachable!()
+        }
+    }
+
+    out.len() == drones.len() + clients.len() + servers.len()
+}
+
 
 fn main() {
     env::set_var("RUST_LOG", "info");
@@ -150,6 +216,10 @@ fn main() {
     }
     if !check_server_connections(&server, &drones_id){
         println!("Some servers have bad connections");
+        return;
+    }
+    if !check_bidirectional_and_connected(&drone, &client, &server){
+        println!("The graph is not bidirectional or connected");
         return;
     }
 
