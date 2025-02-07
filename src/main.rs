@@ -6,13 +6,14 @@ use common::{Client as ClientTrait, Server as ServerTrait};
 use crossbeam_channel::{Receiver, Sender};
 use dr_ones::Drone as DrDrone;
 use getdroned::GetDroned;
-use itertools::chain;
+use itertools::{chain, Itertools};
 use rolling_drone::RollingDrone;
 use rust_do_it::RustDoIt;
 use rust_roveri::RustRoveri;
 use rustafarian_drone::RustafarianDrone;
 use rusteze_drone::RustezeDrone;
 use rusty_drones::RustyDrone;
+use drone_bettercalldrone::BetterCallDrone;
 use std::collections::HashMap;
 use std::fs;
 use wg_2024::config::Config;
@@ -23,6 +24,9 @@ use wg_2024::network::NodeId;
 use wg_2024::packet::Packet;
 use std::env;
 use ap2024_unitn_cppenjoyers_drone::CppEnjoyersDrone;
+
+#[cfg(test)]
+mod test;
 
 macro_rules! create_boxed {
     ($type:ty) => {
@@ -63,6 +67,40 @@ fn create_channels<'a, T>(
     ]
 }
 
+fn check_id_repetitions(drones_id: &Vec<NodeId>, clients_id: &Vec<NodeId>, servers_id: &Vec<NodeId>) -> bool {
+    [drones_id.clone(), clients_id.clone(), servers_id.clone()].concat().iter().all_unique()
+}
+
+fn check_pdr(drones: &Vec<Drone>) -> bool {
+    drones.iter().all(|d| (0.0..=1.0).contains(&d.pdr))
+}
+
+fn check_drone_connections(drones: &Vec<Drone>) -> bool{
+    drones.iter().all(|drone| {
+        !drone.connected_node_ids.contains(&drone.id) &&
+        drone.connected_node_ids.iter().all_unique()
+    })
+}
+
+fn check_client_connections(clients: &Vec<Client>, drones_id: &Vec<NodeId>) -> bool{
+    clients.iter().all(|client|
+        !client.connected_drone_ids.contains(&client.id) &&
+        client.connected_drone_ids.iter().all_unique() &&
+        client.connected_drone_ids.iter().all(|neighbor| drones_id.contains(&neighbor)) &&
+        client.connected_drone_ids.len() > 0 && client.connected_drone_ids.len() < 3
+    )
+}
+
+fn check_server_connections(servers: &Vec<Server>, drones_id: &Vec<NodeId>) -> bool{
+    servers.iter().all(|server|
+        !server.connected_drone_ids.contains(&server.id) &&
+        server.connected_drone_ids.iter().all_unique() &&
+        server.connected_drone_ids.iter().all(|neighbor| drones_id.contains(&neighbor)) &&
+        server.connected_drone_ids.len() > 1
+    )
+}
+
+
 fn main() {
     env::set_var("RUST_LOG", "info");
     let _ = env_logger::try_init();
@@ -76,7 +114,7 @@ fn main() {
         create_boxed!(RustyDrone),
         create_boxed!(GetDroned),
         create_boxed!(NoSoundDroneRIP),
-        create_boxed!(CppEnjoyersDrone),
+        create_boxed!(BetterCallDrone),
     ];
 
     let config_data: String =
@@ -87,6 +125,32 @@ fn main() {
         client,
         server,
     }: Config = toml::from_str(&config_data).expect("Unable to parse TOML");
+
+    // check topology constraints
+    let drones_id: Vec<u8> = drone.iter().map(|drone| drone.id).collect();
+    let client_id: Vec<u8> = client.iter().map(|client| client.id).collect();
+    let servers_id: Vec<u8> = server.iter().map(|server| server.id).collect();
+
+    if !check_id_repetitions(&drones_id, &client_id, &servers_id){
+        println!("Some IDs are repeated");
+        return;
+    }
+    if !check_pdr(&drone) {
+        println!("Some PDRs are not in the range [0, 1]");
+        return;
+    }
+    if !check_drone_connections(&drone) {
+        println!("Some drones have bad connections");
+        return;
+    }
+    if !check_client_connections(&client, &drones_id){
+        println!("Some clients have bad connections");
+        return;
+    }
+    if !check_server_connections(&server, &drones_id){
+        println!("Some servers have bad connections");
+        return;
+    }
 
     // TODO modulation
     let scl_events: HashMap<NodeId, (Sender<DroneEvent>, Receiver<DroneEvent>)> = drone
