@@ -1,7 +1,6 @@
 #![warn(clippy::pedantic)]
 
 use ap2024_rustinpeace_nosounddrone::NoSoundDroneRIP;
-use ap2024_unitn_cppenjoyers_drone::CppEnjoyersDrone;
 use common::slc_commands::{
     ChatClientCommand, ChatClientEvent, ServerCommand, ServerEvent, WebClientCommand,
     WebClientEvent,
@@ -12,8 +11,6 @@ use dr_ones::Drone as DrDrone;
 use drone_bettercalldrone::BetterCallDrone;
 use getdroned::GetDroned;
 use itertools::{chain, Itertools};
-use petgraph::graph;
-use petgraph::prelude::DiGraphMap;
 use rolling_drone::RollingDrone;
 use rust_do_it::RustDoIt;
 use rust_roveri::RustRoveri;
@@ -23,7 +20,6 @@ use rusty_drones::RustyDrone;
 use std::collections::{HashMap, VecDeque};
 use std::env;
 use std::fs;
-use web_client::web_client::WebBrowser;
 use wg_2024::config::Config;
 use wg_2024::config::{Client, Drone, Server};
 use wg_2024::controller::{DroneCommand, DroneEvent};
@@ -103,8 +99,8 @@ fn check_client_connections(clients: &Vec<Client>, drones_id: &Vec<NodeId>) -> b
             && client
                 .connected_drone_ids
                 .iter()
-                .all(|neighbor| drones_id.contains(&neighbor))
-            && client.connected_drone_ids.len() > 0
+                .all(|neighbor| drones_id.contains(neighbor))
+            && !client.connected_drone_ids.is_empty()
             && client.connected_drone_ids.len() < 3
     })
 }
@@ -116,7 +112,7 @@ fn check_server_connections(servers: &Vec<Server>, drones_id: &Vec<NodeId>) -> b
             && server
                 .connected_drone_ids
                 .iter()
-                .all(|neighbor| drones_id.contains(&neighbor))
+                .all(|neighbor| drones_id.contains(neighbor))
             && server.connected_drone_ids.len() > 1
     })
 }
@@ -183,7 +179,7 @@ fn check_connected_only_drones(drones: &Vec<Drone>, drones_is: &Vec<NodeId>) -> 
                 .connected_node_ids
                 .iter()
                 .filter(|neighbor| drones_is.contains(neighbor))
-                .map(|id| *id)
+                .copied()
                 .collect(),
             pdr: d.pdr,
         })
@@ -329,7 +325,7 @@ fn main() {
             Receiver<Packet>,
         ),
     > = HashMap::new();
-    let mut scl_chat_clients_channels: HashMap<
+    let scl_chat_clients_channels: HashMap<
         NodeId,
         (
             Sender<ChatClientCommand>,
