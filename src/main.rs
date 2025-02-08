@@ -241,15 +241,15 @@ fn check_topology_constraints(drone: &[Drone], client: &[Client], server: &[Serv
         println!("Some IDs are repeated");
         return false;
     }
-    if !check_pdr(&drone) {
+    if !check_pdr(drone) {
         println!("Some PDRs are not in the range [0, 1]");
         return false;
     }
-    if !check_drone_connections(&drone) {
+    if !check_drone_connections(drone) {
         println!("Some drones have bad connections");
         return false;
     }
-    if !check_client_connections(&client, &drones_id) {
+    if !check_client_connections(client, &drones_id) {
         println!("Some clients have bad connections");
         return false;
     }
@@ -257,11 +257,11 @@ fn check_topology_constraints(drone: &[Drone], client: &[Client], server: &[Serv
         println!("Some servers have bad connections");
         return false;
     }
-    if !check_bidirectional_and_connected(&drone, &client, &server) {
+    if !check_bidirectional_and_connected(drone, client, server) {
         println!("The graph is not bidirectional or connected");
         return false;
     }
-    if !check_connected_only_drones(&drone, &drones_id) {
+    if !check_connected_only_drones(drone, &drones_id) {
         println!("The graph contains clients/servers that are not at the edges of the network");
         return false;
     }
