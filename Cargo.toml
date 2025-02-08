@@ -33,5 +33,4 @@ ap2024_unitn_cppenjoyers_webservers = {git = "https://github.com/Cpp-enjoyers/Te
 chat_common = {git = "https://github.com/Cpp-enjoyers/chat_common.git"}
 chat_server_client = { git = "https://github.com/Cpp-enjoyers/chat_client_server.git" }
 petgraph = "0.7"
-petgraph = "0.7"
 rand = "0.5"
