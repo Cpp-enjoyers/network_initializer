@@ -1,16 +1,16 @@
 #![warn(clippy::pedantic)]
 
-use ap2024_rustinpeace_nosounddrone::NoSoundDroneRIP;
 use common::slc_commands::{
     ChatClientCommand, ChatClientEvent, ServerCommand, ServerEvent, WebClientCommand,
     WebClientEvent,
 };
 use common::{Client as ClientTrait, Server as ServerTrait};
 use crossbeam_channel::{Receiver, Sender};
+use itertools::{chain, Itertools};
 use dr_ones::Drone as DrDrone;
 use drone_bettercalldrone::BetterCallDrone;
 use getdroned::GetDroned;
-use itertools::{chain, Itertools};
+use ap2024_rustinpeace_nosounddrone::NoSoundDroneRIP;
 use rolling_drone::RollingDrone;
 use rust_do_it::RustDoIt;
 use rust_roveri::RustRoveri;
@@ -422,7 +422,7 @@ fn main() {
                 .iter()
                 .map(|id: &NodeId| (*id, channels[id].0.clone()))
                 .collect();
-            let mut new_server = servers::servers::TextServer::new(
+            let mut new_server = ap2024_unitn_cppenjoyers_webservers::TextServer::new(
                 s.id,
                 scl_server_events[&s.id].0.clone(),
                 scl_server_commands[&s.id].1.clone(),
@@ -436,7 +436,7 @@ fn main() {
                 .iter()
                 .map(|id: &NodeId| (*id, channels[id].0.clone()))
                 .collect();
-            let mut new_server = servers::servers::MediaServer::new(
+            let mut new_server = ap2024_unitn_cppenjoyers_webservers::MediaServer::new(
                 s.id,
                 scl_server_events[&s.id].0.clone(),
                 scl_server_commands[&s.id].1.clone(),

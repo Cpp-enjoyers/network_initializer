@@ -247,7 +247,7 @@ dependencies = [
 [[package]]
 name = "ap2024_rustinpeace_nosounddrone"
 version = "0.1.0"
-source = "git+https://github.com/Rust-In-Peace-AP/No-Sound-Drone.git#61c2deb5fad2444964dd8aae5166ac3e2f73e132"
+source = "git+https://github.com/Rust-In-Peace-AP/No-Sound-Drone.git#2df3024108a1bffe36edcb2e8e6931ba72310a5e"
 dependencies = [
  "crossbeam-channel",
  "rand 0.8.5",
@@ -257,13 +257,30 @@ dependencies = [
 [[package]]
 name = "ap2024_unitn_cppenjoyers_drone"
 version = "0.9.0"
-source = "git+https://github.com/Cpp-enjoyers/drone.git#84d61b55452233e1cdd4c6ceab3a88e81af5f021"
+source = "git+https://github.com/Cpp-enjoyers/drone.git#93e95169f3444c079d0516c4060cb991e67801c8"
 dependencies = [
  "common",
  "crossbeam-channel",
  "log",
  "pretty_env_logger",
  "rand 0.8.5",
+ "wg_2024",
+]
+
+[[package]]
+name = "ap2024_unitn_cppenjoyers_webservers"
+version = "0.1.0"
+source = "git+https://github.com/Cpp-enjoyers/Text_Media_server#55ca95d2faca4105ec15325b40e1f166a583c634"
+dependencies = [
+ "ap2024_unitn_cppenjoyers_drone",
+ "bincode",
+ "common",
+ "compression",
+ "crossbeam-channel",
+ "itertools",
+ "log",
+ "petgraph 0.7.1",
+ "serde",
  "wg_2024",
 ]
 
@@ -774,6 +791,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "cloudabi"
+version = "0.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ddfc5b9aa5d4507acaf872de71051dfd0e309860e88966e1051e462a077aac4f"
+dependencies = [
+ "bitflags 1.3.2",
+]
+
+[[package]]
 name = "codespan-reporting"
 version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -812,7 +838,7 @@ dependencies = [
 [[package]]
 name = "common"
 version = "0.1.0"
-source = "git+https://github.com/Cpp-enjoyers/common.git#b834908c79f09b81d22c31a190247c7264498cff"
+source = "git+https://github.com/Cpp-enjoyers/common.git#8ea1de22be4b1e0b3f98c7533dec17e2a10013d8"
 dependencies = [
  "bincode",
  "crossbeam-channel",
@@ -1519,6 +1545,12 @@ checksum = "e13624c2627564efccf4934284bdd98cbaa14e79b0b5a141218e507b3a823456"
 dependencies = [
  "percent-encoding",
 ]
+
+[[package]]
+name = "fuchsia-cprng"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a06f77d526c1a601b7c4cdd98f54b5eaabffc14d5f2f0296febdc7f357c6d3ba"
 
 [[package]]
 name = "futf"
@@ -2587,6 +2619,7 @@ version = "0.1.0"
 dependencies = [
  "ap2024_rustinpeace_nosounddrone",
  "ap2024_unitn_cppenjoyers_drone",
+ "ap2024_unitn_cppenjoyers_webservers",
  "common",
  "crossbeam-channel",
  "dr_ones",
@@ -2597,13 +2630,13 @@ dependencies = [
  "itertools",
  "log",
  "petgraph 0.7.1",
+ "rand 0.5.6",
  "rolling_drone",
  "rust-roveri",
  "rust_do_it",
  "rustafarian-drone",
  "rusteze_drone",
  "rusty_drones",
- "servers",
  "simulation_controller",
  "toml",
  "web_client",
@@ -3219,6 +3252,19 @@ dependencies = [
 
 [[package]]
 name = "rand"
+version = "0.5.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c618c47cd3ebd209790115ab837de41425723956ad3ce2e6a7f09890947cacb9"
+dependencies = [
+ "cloudabi",
+ "fuchsia-cprng",
+ "libc",
+ "rand_core 0.3.1",
+ "winapi",
+]
+
+[[package]]
+name = "rand"
 version = "0.8.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "34af8d1a0e25924bc5b7c43c079c942339d8f0a8b57c39049bef581b46327404"
@@ -3258,6 +3304,21 @@ dependencies = [
  "ppv-lite86",
  "rand_core 0.9.0",
 ]
+
+[[package]]
+name = "rand_core"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7a6fdeb83b075e8266dcc8762c22776f6877a63111121f5f8c7411e5be7eed4b"
+dependencies = [
+ "rand_core 0.4.2",
+]
+
+[[package]]
+name = "rand_core"
+version = "0.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9c33a3c44ca05fa6f1807d8e6743f3824e8509beca625669633be0acbdf509dc"
 
 [[package]]
 name = "rand_core"
@@ -3597,23 +3658,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "servers"
-version = "0.1.0"
-source = "git+https://github.com/Cpp-enjoyers/Text_Media_server#a4f50bae82a86870a9fee9acd14ede4fb090d8a3"
-dependencies = [
- "ap2024_unitn_cppenjoyers_drone",
- "bincode",
- "common",
- "compression",
- "crossbeam-channel",
- "itertools",
- "log",
- "petgraph 0.7.1",
- "serde",
- "wg_2024",
-]
-
-[[package]]
 name = "servo_arc"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3657,7 +3701,7 @@ checksum = "d66dc143e6b11c1eddc06d5c423cfc97062865baf299914ab64caa38182078fe"
 [[package]]
 name = "simulation_controller"
 version = "0.1.0"
-source = "git+https://github.com/Cpp-enjoyers/simulation-controller.git#975e6929c77e71d6bbf8cf91558b93665dd55a03"
+source = "git+https://github.com/Cpp-enjoyers/simulation-controller.git#b108ece61d2c78f2fc44a8f6ea4ccdd2d828ddc7"
 dependencies = [
  "ap2024_unitn_cppenjoyers_drone",
  "common",
@@ -4472,7 +4516,7 @@ dependencies = [
 [[package]]
 name = "web_client"
 version = "0.1.0"
-source = "git+https://github.com/Cpp-enjoyers/web_client#597c9bba61f0c5afa2d94f80b7dbe94de52a9982"
+source = "git+https://github.com/Cpp-enjoyers/web_client#f6ccc21f28150f7539e77f92e71947000904f3bf"
 dependencies = [
  "bincode",
  "common",
