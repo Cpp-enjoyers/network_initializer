@@ -288,7 +288,7 @@ fn main() {
         return;
     }
     if !check_connected_only_drones(&drone, &drones_id) {
-        println!("The graph contains clients/servers that are not at the edges of teh network");
+        println!("The graph contains clients/servers that are not at the edges of the network");
         return;
     }
 
