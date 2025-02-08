@@ -2,7 +2,7 @@ use std::vec;
 
 use wg_2024::config::{self, Client, Config, Drone, Server};
 
-use crate::{check_bidirectional_and_connected, check_client_connections, check_drone_connections, check_id_repetitions, check_pdr, check_server_connections};
+use crate::{check_bidirectional_and_connected, check_client_connections, check_connected_only_drones, check_drone_connections, check_id_repetitions, check_pdr, check_server_connections};
 
 fn correct_config() -> Config {
     Config{
@@ -129,5 +129,22 @@ fn test_bidirectional_and_connected(){
     client.pop();
     client[0].connected_drone_ids.pop();
     assert!(!check_bidirectional_and_connected(&drone, &client, &server));
+
+}
+
+#[test]
+fn test_connected_only_drones(){
+    let Config{mut drone,..} = correct_config();
+
+    let drones_id: Vec<u8> = drone.iter().map(|drone| drone.id).collect();
+
+
+    assert!(check_connected_only_drones(&drone, &drones_id));
+
+    drone[0].connected_node_ids[1] = 10;
+    assert!(!check_connected_only_drones(&drone, &drones_id));
+
+    drone[0].connected_node_ids.pop();
+    assert!(!check_connected_only_drones(&drone, &drones_id));
 
 }

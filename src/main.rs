@@ -2,6 +2,7 @@
 
 use ap2024_rustinpeace_nosounddrone::NoSoundDroneRIP;
 use common::slc_commands::{ChatClientCommand, ChatClientEvent, ServerCommand, ServerEvent, WebClientCommand, WebClientEvent};
+use petgraph::graph;
 use petgraph::prelude::DiGraphMap;
 use web_client::web_client::WebBrowser;
 use common::{Client as ClientTrait, Server as ServerTrait};
@@ -104,23 +105,6 @@ fn check_server_connections(servers: &Vec<Server>, drones_id: &Vec<NodeId>) -> b
 }
 
 fn check_bidirectional_and_connected(drones: &Vec<Drone>, clients: &Vec<Client>, servers: &Vec<Server>) -> bool{
-    let mut graph = DiGraphMap::new();
-
-    for drone in drones{
-        for to in &drone.connected_node_ids{
-            graph.add_edge(drone.id, *to, 0);
-        }
-    }
-    for client in clients{
-        for to in &client.connected_drone_ids{
-            graph.add_edge(client.id, *to, 0);
-        }
-    }
-    for server in servers{
-        for to in &server.connected_drone_ids{
-            graph.add_edge(server.id, *to, 0);
-        }
-    }
 
     let mut out = vec![drones[0].id];
     let mut queue: VecDeque<(u8, u8)> = VecDeque::new();
@@ -129,12 +113,12 @@ fn check_bidirectional_and_connected(drones: &Vec<Drone>, clients: &Vec<Client>,
     }
 
     while let Some((parent, next_id)) = queue.pop_front() {
-        if out.contains(&next_id){
-            continue;
-        }
         if let Some(next_drone) = drones.iter().find(|d|d.id == next_id){
             if !next_drone.connected_node_ids.contains(&parent){
                 return false;
+            }
+            if out.contains(&next_id){
+                continue;
             }
             out.push(next_drone.id);
             for conn in &next_drone.connected_node_ids{
@@ -145,6 +129,9 @@ fn check_bidirectional_and_connected(drones: &Vec<Drone>, clients: &Vec<Client>,
             if !next_client.connected_drone_ids.contains(&parent){
                 return false;
             }
+            if out.contains(&next_id){
+                continue;
+            }
             out.push(next_client.id);
             for conn in &next_client.connected_drone_ids{
                 queue.push_back((next_client.id, *conn));
@@ -154,19 +141,35 @@ fn check_bidirectional_and_connected(drones: &Vec<Drone>, clients: &Vec<Client>,
             if !next_server.connected_drone_ids.contains(&parent){
                 return false;
             }
+            if out.contains(&next_id){
+                continue;
+            }
             out.push(next_server.id);
             for conn in &next_server.connected_drone_ids{
                 queue.push_back((next_server.id, *conn));
             }
         }
         else {
-            unreachable!()
+            return false;
         }
     }
 
     out.len() == drones.len() + clients.len() + servers.len()
 }
 
+fn check_connected_only_drones(drones: &Vec<Drone>, drones_is: &Vec<NodeId>) -> bool {
+    let only_drones: Vec<Drone> = drones.iter().map(|d|{
+        Drone{
+            id: d.id,
+            connected_node_ids: d.connected_node_ids.iter().filter(|neighbor| drones_is.contains(neighbor)).map(|id| *id).collect(),
+            pdr: d.pdr
+        }
+    }
+    ).collect();
+
+    check_bidirectional_and_connected(&only_drones, &vec![], &vec![])
+
+}
 
 fn main() {
     env::set_var("RUST_LOG", "info");
@@ -222,6 +225,11 @@ fn main() {
         println!("The graph is not bidirectional or connected");
         return;
     }
+    if !check_connected_only_drones(&drone, &drones_id){
+        println!("The graph contains clients/servers that are not at the edges of teh network");
+        return;
+    }
+    // TODO check if still connected without clients/servers
 
     // TODO modulation
     let scl_events: HashMap<NodeId, (Sender<DroneEvent>, Receiver<DroneEvent>)> = drone
