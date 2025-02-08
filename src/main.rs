@@ -1,32 +1,35 @@
 #![warn(clippy::pedantic)]
 
 use ap2024_rustinpeace_nosounddrone::NoSoundDroneRIP;
-use common::slc_commands::{ChatClientCommand, ChatClientEvent, ServerCommand, ServerEvent, WebClientCommand, WebClientEvent};
-use petgraph::graph;
-use petgraph::prelude::DiGraphMap;
-use web_client::web_client::WebBrowser;
+use ap2024_unitn_cppenjoyers_drone::CppEnjoyersDrone;
+use common::slc_commands::{
+    ChatClientCommand, ChatClientEvent, ServerCommand, ServerEvent, WebClientCommand,
+    WebClientEvent,
+};
 use common::{Client as ClientTrait, Server as ServerTrait};
 use crossbeam_channel::{Receiver, Sender};
 use dr_ones::Drone as DrDrone;
+use drone_bettercalldrone::BetterCallDrone;
 use getdroned::GetDroned;
 use itertools::{chain, Itertools};
+use petgraph::graph;
+use petgraph::prelude::DiGraphMap;
 use rolling_drone::RollingDrone;
 use rust_do_it::RustDoIt;
 use rust_roveri::RustRoveri;
 use rustafarian_drone::RustafarianDrone;
 use rusteze_drone::RustezeDrone;
 use rusty_drones::RustyDrone;
-use drone_bettercalldrone::BetterCallDrone;
 use std::collections::{HashMap, VecDeque};
+use std::env;
 use std::fs;
+use web_client::web_client::WebBrowser;
 use wg_2024::config::Config;
 use wg_2024::config::{Client, Drone, Server};
 use wg_2024::controller::{DroneCommand, DroneEvent};
 use wg_2024::drone::Drone as DroneTrait;
 use wg_2024::network::NodeId;
 use wg_2024::packet::Packet;
-use std::env;
-use ap2024_unitn_cppenjoyers_drone::CppEnjoyersDrone;
 // use chat_common;
 
 #[cfg(test)]
@@ -71,85 +74,99 @@ fn create_channels<'a, T>(
     ]
 }
 
-fn check_id_repetitions(drones_id: &Vec<NodeId>, clients_id: &Vec<NodeId>, servers_id: &Vec<NodeId>) -> bool {
-    [drones_id.clone(), clients_id.clone(), servers_id.clone()].concat().iter().all_unique()
+fn check_id_repetitions(
+    drones_id: &Vec<NodeId>,
+    clients_id: &Vec<NodeId>,
+    servers_id: &Vec<NodeId>,
+) -> bool {
+    [drones_id.clone(), clients_id.clone(), servers_id.clone()]
+        .concat()
+        .iter()
+        .all_unique()
 }
 
 fn check_pdr(drones: &Vec<Drone>) -> bool {
     drones.iter().all(|d| (0.0..=1.0).contains(&d.pdr))
 }
 
-fn check_drone_connections(drones: &Vec<Drone>) -> bool{
+fn check_drone_connections(drones: &Vec<Drone>) -> bool {
     drones.iter().all(|drone| {
-        !drone.connected_node_ids.contains(&drone.id) &&
-        drone.connected_node_ids.iter().all_unique()
+        !drone.connected_node_ids.contains(&drone.id)
+            && drone.connected_node_ids.iter().all_unique()
     })
 }
 
-fn check_client_connections(clients: &Vec<Client>, drones_id: &Vec<NodeId>) -> bool{
-    clients.iter().all(|client|
-        !client.connected_drone_ids.contains(&client.id) &&
-        client.connected_drone_ids.iter().all_unique() &&
-        client.connected_drone_ids.iter().all(|neighbor| drones_id.contains(&neighbor)) &&
-        client.connected_drone_ids.len() > 0 && client.connected_drone_ids.len() < 3
-    )
+fn check_client_connections(clients: &Vec<Client>, drones_id: &Vec<NodeId>) -> bool {
+    clients.iter().all(|client| {
+        !client.connected_drone_ids.contains(&client.id)
+            && client.connected_drone_ids.iter().all_unique()
+            && client
+                .connected_drone_ids
+                .iter()
+                .all(|neighbor| drones_id.contains(&neighbor))
+            && client.connected_drone_ids.len() > 0
+            && client.connected_drone_ids.len() < 3
+    })
 }
 
-fn check_server_connections(servers: &Vec<Server>, drones_id: &Vec<NodeId>) -> bool{
-    servers.iter().all(|server|
-        !server.connected_drone_ids.contains(&server.id) &&
-        server.connected_drone_ids.iter().all_unique() &&
-        server.connected_drone_ids.iter().all(|neighbor| drones_id.contains(&neighbor)) &&
-        server.connected_drone_ids.len() > 1
-    )
+fn check_server_connections(servers: &Vec<Server>, drones_id: &Vec<NodeId>) -> bool {
+    servers.iter().all(|server| {
+        !server.connected_drone_ids.contains(&server.id)
+            && server.connected_drone_ids.iter().all_unique()
+            && server
+                .connected_drone_ids
+                .iter()
+                .all(|neighbor| drones_id.contains(&neighbor))
+            && server.connected_drone_ids.len() > 1
+    })
 }
 
-fn check_bidirectional_and_connected(drones: &Vec<Drone>, clients: &Vec<Client>, servers: &Vec<Server>) -> bool{
-
+fn check_bidirectional_and_connected(
+    drones: &Vec<Drone>,
+    clients: &Vec<Client>,
+    servers: &Vec<Server>,
+) -> bool {
     let mut out = vec![drones[0].id];
     let mut queue: VecDeque<(u8, u8)> = VecDeque::new();
-    for conn in &drones[0].connected_node_ids{
+    for conn in &drones[0].connected_node_ids {
         queue.push_back((drones[0].id, *conn));
     }
 
     while let Some((parent, next_id)) = queue.pop_front() {
-        if let Some(next_drone) = drones.iter().find(|d|d.id == next_id){
-            if !next_drone.connected_node_ids.contains(&parent){
+        if let Some(next_drone) = drones.iter().find(|d| d.id == next_id) {
+            if !next_drone.connected_node_ids.contains(&parent) {
                 return false;
             }
-            if out.contains(&next_id){
+            if out.contains(&next_id) {
                 continue;
             }
             out.push(next_drone.id);
-            for conn in &next_drone.connected_node_ids{
+            for conn in &next_drone.connected_node_ids {
                 queue.push_back((next_drone.id, *conn));
             }
-        }
-        else if let Some(next_client) = clients.iter().find(|c|c.id == next_id){
-            if !next_client.connected_drone_ids.contains(&parent){
+        } else if let Some(next_client) = clients.iter().find(|c| c.id == next_id) {
+            if !next_client.connected_drone_ids.contains(&parent) {
                 return false;
             }
-            if out.contains(&next_id){
+            if out.contains(&next_id) {
                 continue;
             }
             out.push(next_client.id);
-            for conn in &next_client.connected_drone_ids{
+            for conn in &next_client.connected_drone_ids {
                 queue.push_back((next_client.id, *conn));
             }
-        }
-        else if let Some(next_server) = servers.iter().find(|c|c.id == next_id){
-            if !next_server.connected_drone_ids.contains(&parent){
+        } else if let Some(next_server) = servers.iter().find(|c| c.id == next_id) {
+            if !next_server.connected_drone_ids.contains(&parent) {
                 return false;
             }
-            if out.contains(&next_id){
+            if out.contains(&next_id) {
                 continue;
             }
             out.push(next_server.id);
-            for conn in &next_server.connected_drone_ids{
+            for conn in &next_server.connected_drone_ids {
                 queue.push_back((next_server.id, *conn));
             }
-        }
-        else {
+        } else {
             return false;
         }
     }
@@ -158,17 +175,21 @@ fn check_bidirectional_and_connected(drones: &Vec<Drone>, clients: &Vec<Client>,
 }
 
 fn check_connected_only_drones(drones: &Vec<Drone>, drones_is: &Vec<NodeId>) -> bool {
-    let only_drones: Vec<Drone> = drones.iter().map(|d|{
-        Drone{
+    let only_drones: Vec<Drone> = drones
+        .iter()
+        .map(|d| Drone {
             id: d.id,
-            connected_node_ids: d.connected_node_ids.iter().filter(|neighbor| drones_is.contains(neighbor)).map(|id| *id).collect(),
-            pdr: d.pdr
-        }
-    }
-    ).collect();
+            connected_node_ids: d
+                .connected_node_ids
+                .iter()
+                .filter(|neighbor| drones_is.contains(neighbor))
+                .map(|id| *id)
+                .collect(),
+            pdr: d.pdr,
+        })
+        .collect();
 
     check_bidirectional_and_connected(&only_drones, &vec![], &vec![])
-
 }
 
 fn main() {
@@ -197,11 +218,12 @@ fn main() {
     }: Config = toml::from_str(&config_data).expect("Unable to parse TOML");
 
     // check topology constraints
+
     let drones_id: Vec<u8> = drone.iter().map(|drone| drone.id).collect();
     let client_id: Vec<u8> = client.iter().map(|client| client.id).collect();
     let servers_id: Vec<u8> = server.iter().map(|server| server.id).collect();
 
-    if !check_id_repetitions(&drones_id, &client_id, &servers_id){
+    if !check_id_repetitions(&drones_id, &client_id, &servers_id) {
         println!("Some IDs are repeated");
         return;
     }
@@ -213,23 +235,22 @@ fn main() {
         println!("Some drones have bad connections");
         return;
     }
-    if !check_client_connections(&client, &drones_id){
+    if !check_client_connections(&client, &drones_id) {
         println!("Some clients have bad connections");
         return;
     }
-    if !check_server_connections(&server, &drones_id){
+    if !check_server_connections(&server, &drones_id) {
         println!("Some servers have bad connections");
         return;
     }
-    if !check_bidirectional_and_connected(&drone, &client, &server){
+    if !check_bidirectional_and_connected(&drone, &client, &server) {
         println!("The graph is not bidirectional or connected");
         return;
     }
-    if !check_connected_only_drones(&drone, &drones_id){
+    if !check_connected_only_drones(&drone, &drones_id) {
         println!("The graph contains clients/servers that are not at the edges of teh network");
         return;
     }
-    // TODO check if still connected without clients/servers
 
     // TODO modulation
     let scl_events: HashMap<NodeId, (Sender<DroneEvent>, Receiver<DroneEvent>)> = drone
@@ -243,16 +264,19 @@ fn main() {
         .collect();
 
     // TODO: channels for servers and clients
-    let scl_web_client_events: HashMap<NodeId, (Sender<WebClientEvent>, Receiver<WebClientEvent>)> = client
-        .iter()
-        .map(|c: &Client| (c.id, crossbeam_channel::unbounded()))
-        .collect();
-
-    let scl_web_client_commands: HashMap<NodeId, (Sender<WebClientCommand>, Receiver<WebClientCommand>)> =
+    let scl_web_client_events: HashMap<NodeId, (Sender<WebClientEvent>, Receiver<WebClientEvent>)> =
         client
             .iter()
             .map(|c: &Client| (c.id, crossbeam_channel::unbounded()))
             .collect();
+
+    let scl_web_client_commands: HashMap<
+        NodeId,
+        (Sender<WebClientCommand>, Receiver<WebClientCommand>),
+    > = client
+        .iter()
+        .map(|c: &Client| (c.id, crossbeam_channel::unbounded()))
+        .collect();
 
     let scl_server_events: HashMap<NodeId, (Sender<ServerEvent>, Receiver<ServerEvent>)> = server
         .iter()
@@ -287,14 +311,42 @@ fn main() {
     }
 
     // TODO spawn client/server + start scl
-    let mut scl_drones_channels: HashMap<NodeId, (Sender<DroneCommand>, Receiver<DroneEvent>, Sender<Packet>, Receiver<Packet>)> =
-        HashMap::new();
-    let mut scl_web_clients_channels: HashMap<NodeId, (Sender<WebClientCommand>, Receiver<WebClientEvent>, Sender<Packet>, Receiver<Packet>)> =
-        HashMap::new();
-    let mut scl_chat_clients_channels: HashMap<NodeId, (Sender<ChatClientCommand>, Receiver<ChatClientEvent>, Sender<Packet>, Receiver<Packet>)> =
-        HashMap::new();
-    let mut scl_servers_channels: HashMap<NodeId, (Sender<ServerCommand>, Receiver<ServerEvent>, Sender<Packet>, Receiver<Packet>)> =
-        HashMap::new();
+    let mut scl_drones_channels: HashMap<
+        NodeId,
+        (
+            Sender<DroneCommand>,
+            Receiver<DroneEvent>,
+            Sender<Packet>,
+            Receiver<Packet>,
+        ),
+    > = HashMap::new();
+    let mut scl_web_clients_channels: HashMap<
+        NodeId,
+        (
+            Sender<WebClientCommand>,
+            Receiver<WebClientEvent>,
+            Sender<Packet>,
+            Receiver<Packet>,
+        ),
+    > = HashMap::new();
+    let mut scl_chat_clients_channels: HashMap<
+        NodeId,
+        (
+            Sender<ChatClientCommand>,
+            Receiver<ChatClientEvent>,
+            Sender<Packet>,
+            Receiver<Packet>,
+        ),
+    > = HashMap::new();
+    let mut scl_servers_channels: HashMap<
+        NodeId,
+        (
+            Sender<ServerCommand>,
+            Receiver<ServerEvent>,
+            Sender<Packet>,
+            Receiver<Packet>,
+        ),
+    > = HashMap::new();
     for d in &drone {
         scl_drones_channels.insert(
             d.id,
@@ -302,7 +354,7 @@ fn main() {
                 scl_commands[&d.id].0.clone(),
                 scl_events[&d.id].1.clone(),
                 channels[&d.id].0.clone(),
-                channels[&d.id].1.clone()
+                channels[&d.id].1.clone(),
             ),
         );
     }

@@ -257,8 +257,9 @@ dependencies = [
 [[package]]
 name = "ap2024_unitn_cppenjoyers_drone"
 version = "0.9.0"
-source = "git+https://github.com/Cpp-enjoyers/drone.git#d328f66bd3a12257b89de7c64cd09f2a49c605c3"
+source = "git+https://github.com/Cpp-enjoyers/drone.git#84d61b55452233e1cdd4c6ceab3a88e81af5f021"
 dependencies = [
+ "common",
  "crossbeam-channel",
  "log",
  "pretty_env_logger",
@@ -707,9 +708,9 @@ dependencies = [
 
 [[package]]
 name = "cc"
-version = "1.2.12"
+version = "1.2.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "755717a7de9ec452bf7f3f1a3099085deabd7f2962b861dae91ecd7a365903d2"
+checksum = "c7777341816418c02e033934a09f20dc0ccaf65a5201ef8a450ae0105a573fda"
 dependencies = [
  "jobserver",
  "libc",
@@ -3373,7 +3374,7 @@ dependencies = [
 [[package]]
 name = "rust_do_it"
 version = "0.1.0"
-source = "git+https://github.com/RustDoIt/Drone.git#844f691564b98ad5f7fe665bd84ca35032c2dda1"
+source = "git+https://github.com/RustDoIt/Drone.git#8545bfb5a81a3b64f776a3abccd236de7a7cd500"
 dependencies = [
  "crossbeam-channel",
  "env_logger 0.11.6",
@@ -3598,7 +3599,7 @@ dependencies = [
 [[package]]
 name = "servers"
 version = "0.1.0"
-source = "git+https://github.com/Cpp-enjoyers/Text_Media_server#0dc8a1cc41e8cb87ffd17170b7464ff9a712c3c5"
+source = "git+https://github.com/Cpp-enjoyers/Text_Media_server#a4f50bae82a86870a9fee9acd14ede4fb090d8a3"
 dependencies = [
  "ap2024_unitn_cppenjoyers_drone",
  "bincode",
@@ -3656,8 +3657,9 @@ checksum = "d66dc143e6b11c1eddc06d5c423cfc97062865baf299914ab64caa38182078fe"
 [[package]]
 name = "simulation_controller"
 version = "0.1.0"
-source = "git+https://github.com/Cpp-enjoyers/simulation-controller.git#55a49677d2382da17b4ec7691562c09aad4da9f5"
+source = "git+https://github.com/Cpp-enjoyers/simulation-controller.git#975e6929c77e71d6bbf8cf91558b93665dd55a03"
 dependencies = [
+ "ap2024_unitn_cppenjoyers_drone",
  "common",
  "crossbeam-channel",
  "eframe",
@@ -4470,7 +4472,7 @@ dependencies = [
 [[package]]
 name = "web_client"
 version = "0.1.0"
-source = "git+https://github.com/Cpp-enjoyers/web_client#2dca39939c296f39b475009a513d02c71a94b2c1"
+source = "git+https://github.com/Cpp-enjoyers/web_client#597c9bba61f0c5afa2d94f80b7dbe94de52a9982"
 dependencies = [
  "bincode",
  "common",
