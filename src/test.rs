@@ -398,6 +398,20 @@ fn tree(){
 }
 
 #[test]
+fn subnet1(){
+    let config_data: String =
+        fs::read_to_string("config/sub_net_1.toml").expect("Unable to read config file");
+    // having our structs implement the Deserialize trait allows us to use the toml::from_str function to deserialize the config file into each of them
+    let Config {
+        drone,
+        client,
+        server,
+    }: Config = toml::from_str(&config_data).expect("Unable to parse TOML");
+
+    assert!(check_topology_constraints(&drone, &client, &server));
+}
+
+#[test]
 fn subnet2(){
     let config_data: String =
         fs::read_to_string("config/sub_net_2.toml").expect("Unable to read config file");
@@ -410,6 +424,7 @@ fn subnet2(){
 
     assert!(check_topology_constraints(&drone, &client, &server));
 }
+
 fn star(){
     let config_data: String =
         fs::read_to_string("config/star.toml").expect("Unable to read config file");
