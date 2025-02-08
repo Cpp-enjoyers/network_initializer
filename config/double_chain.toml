@@ -53,5 +53,5 @@ id = 11
 connected_drone_ids = [1]
 
 [[server]]
-id = 11
+id = 12
 connected_drone_ids = [10]
