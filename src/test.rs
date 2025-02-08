@@ -1,10 +1,10 @@
-use std::vec;
+use std::{fs, vec};
 
 use wg_2024::config::{self, Client, Config, Drone, Server};
 
 use crate::{
     check_bidirectional_and_connected, check_client_connections, check_connected_only_drones,
-    check_drone_connections, check_id_repetitions, check_pdr, check_server_connections,
+    check_drone_connections, check_id_repetitions, check_pdr, check_server_connections, check_topology_constraints,
 };
 
 fn correct_config() -> Config {
@@ -181,4 +181,19 @@ fn test_connected_only_drones() {
 
     drone[0].connected_node_ids.pop();
     assert!(!check_connected_only_drones(&drone, &drones_id));
+}
+
+#[test]
+fn double_chain(){
+    let config_data: String =
+        fs::read_to_string("config/double_chain.toml").expect("Unable to read config file");
+    // having our structs implement the Deserialize trait allows us to use the toml::from_str function to deserialize the config file into each of them
+    let Config {
+        drone,
+        client,
+        server,
+    }: Config = toml::from_str(&config_data).expect("Unable to parse TOML");
+
+    assert!(check_topology_constraints(&drone, &client, &server));
+
 }

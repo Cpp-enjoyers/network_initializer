@@ -232,6 +232,43 @@ fn check_connected_only_drones(drones: &[Drone], drones_is: &[NodeId]) -> bool {
     check_bidirectional_and_connected(&only_drones, &[], &[])
 }
 
+fn check_topology_constraints(drone: &[Drone], client: &[Client], server: &[Server]) -> bool{
+    let drones_id: Vec<u8> = drone.iter().map(|drone| drone.id).collect();
+    let client_id: Vec<u8> = client.iter().map(|client| client.id).collect();
+    let servers_id: Vec<u8> = server.iter().map(|server| server.id).collect();
+
+    if !check_id_repetitions(&drones_id, &client_id, &servers_id) {
+        println!("Some IDs are repeated");
+        return false;
+    }
+    if !check_pdr(&drone) {
+        println!("Some PDRs are not in the range [0, 1]");
+        return false;
+    }
+    if !check_drone_connections(&drone) {
+        println!("Some drones have bad connections");
+        return false;
+    }
+    if !check_client_connections(&client, &drones_id) {
+        println!("Some clients have bad connections");
+        return false;
+    }
+    if !check_server_connections(&server, &drones_id) {
+        println!("Some servers have bad connections");
+        return false;
+    }
+    if !check_bidirectional_and_connected(&drone, &client, &server) {
+        println!("The graph is not bidirectional or connected");
+        return false;
+    }
+    if !check_connected_only_drones(&drone, &drones_id) {
+        println!("The graph contains clients/servers that are not at the edges of the network");
+        return false;
+    }
+
+    true
+}
+
 fn main() {
     env::set_var("RUST_LOG", "info");
     let _ = env_logger::try_init();
@@ -258,39 +295,10 @@ fn main() {
     }: Config = toml::from_str(&config_data).expect("Unable to parse TOML");
 
     // check topology constraints
+    if !check_topology_constraints(&drone, &client, &server){
+        return;
+    }
 
-    let drones_id: Vec<u8> = drone.iter().map(|drone| drone.id).collect();
-    let client_id: Vec<u8> = client.iter().map(|client| client.id).collect();
-    let servers_id: Vec<u8> = server.iter().map(|server| server.id).collect();
-
-    if !check_id_repetitions(&drones_id, &client_id, &servers_id) {
-        println!("Some IDs are repeated");
-        return;
-    }
-    if !check_pdr(&drone) {
-        println!("Some PDRs are not in the range [0, 1]");
-        return;
-    }
-    if !check_drone_connections(&drone) {
-        println!("Some drones have bad connections");
-        return;
-    }
-    if !check_client_connections(&client, &drones_id) {
-        println!("Some clients have bad connections");
-        return;
-    }
-    if !check_server_connections(&server, &drones_id) {
-        println!("Some servers have bad connections");
-        return;
-    }
-    if !check_bidirectional_and_connected(&drone, &client, &server) {
-        println!("The graph is not bidirectional or connected");
-        return;
-    }
-    if !check_connected_only_drones(&drone, &drones_id) {
-        println!("The graph contains clients/servers that are not at the edges of the network");
-        return;
-    }
 
     // TODO modulation
     let scl_events: HashMap<NodeId, (Sender<DroneEvent>, Receiver<DroneEvent>)> = drone
