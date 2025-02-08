@@ -31,6 +31,11 @@ use wg_2024::packet::Packet;
 #[cfg(test)]
 mod test;
 
+type DroneChannels = HashMap<NodeId, (Sender<DroneCommand>, Receiver<DroneEvent>, Sender<Packet>, Receiver<Packet>)>;
+type WebClientChannels = HashMap<NodeId, (Sender<WebClientCommand>, Receiver<WebClientEvent>, Sender<Packet>, Receiver<Packet>)>;
+type ChatClientChannels = HashMap<NodeId, (Sender<ChatClientCommand>, Receiver<ChatClientEvent>, Sender<Packet>, Receiver<Packet>)>;
+type ServerChannels = HashMap<NodeId, (Sender<ServerCommand>, Receiver<ServerEvent>, Sender<Packet>, Receiver<Packet>)>;
+
 macro_rules! create_boxed {
     ($type:ty) => {
         |id: NodeId,
@@ -307,42 +312,10 @@ fn main() {
     }
 
     // TODO spawn client/server + start scl
-    let mut scl_drones_channels: HashMap<
-        NodeId,
-        (
-            Sender<DroneCommand>,
-            Receiver<DroneEvent>,
-            Sender<Packet>,
-            Receiver<Packet>,
-        ),
-    > = HashMap::new();
-    let mut scl_web_clients_channels: HashMap<
-        NodeId,
-        (
-            Sender<WebClientCommand>,
-            Receiver<WebClientEvent>,
-            Sender<Packet>,
-            Receiver<Packet>,
-        ),
-    > = HashMap::new();
-    let scl_chat_clients_channels: HashMap<
-        NodeId,
-        (
-            Sender<ChatClientCommand>,
-            Receiver<ChatClientEvent>,
-            Sender<Packet>,
-            Receiver<Packet>,
-        ),
-    > = HashMap::new();
-    let mut scl_servers_channels: HashMap<
-        NodeId,
-        (
-            Sender<ServerCommand>,
-            Receiver<ServerEvent>,
-            Sender<Packet>,
-            Receiver<Packet>,
-        ),
-    > = HashMap::new();
+    let mut scl_drones_channels: DroneChannels = HashMap::new();
+    let mut scl_web_clients_channels: WebClientChannels = HashMap::new();
+    let scl_chat_clients_channels: ChatClientChannels = HashMap::new();
+    let mut scl_servers_channels: ServerChannels = HashMap::new();
     for d in &drone {
         scl_drones_channels.insert(
             d.id,
