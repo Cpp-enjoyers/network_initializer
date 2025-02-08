@@ -425,6 +425,7 @@ fn subnet2(){
     assert!(check_topology_constraints(&drone, &client, &server));
 }
 
+#[test]
 fn star(){
     let config_data: String =
         fs::read_to_string("config/star.toml").expect("Unable to read config file");

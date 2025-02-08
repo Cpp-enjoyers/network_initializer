@@ -1,3 +1,13 @@
+/*!
+    C++Enjoyers: Network Initializer
+
+    This crate implements the network initializer as described in WG protocol.
+    It reads a TOML file containing the topology informations, it checks all the
+    constraints that the protocol put on the topology and, finally, it spawns
+    all the nodes, channels and the simulation controller.
+
+*/
+
 #![warn(clippy::pedantic)]
 
 use common::slc_commands::{
@@ -232,6 +242,7 @@ fn check_connected_only_drones(drones: &[Drone], drones_is: &[NodeId]) -> bool {
     check_bidirectional_and_connected(&only_drones, &[], &[])
 }
 
+/// Checks that the topology respects all the necessary constraints
 fn check_topology_constraints(drone: &[Drone], client: &[Client], server: &[Server]) -> bool{
     let drones_id: Vec<u8> = drone.iter().map(|drone| drone.id).collect();
     let client_id: Vec<u8> = client.iter().map(|client| client.id).collect();

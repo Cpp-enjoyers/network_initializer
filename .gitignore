@@ -21,3 +21,5 @@ Cargo.lock
 #.idea/
 
 tmp/
+test.sh
+text

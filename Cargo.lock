@@ -253,7 +253,7 @@ checksum = "34ac096ce696dc2fcabef30516bb13c0a68a11d30131d3df6f04711467681b04"
 [[package]]
 name = "ap2024_rustinpeace_nosounddrone"
 version = "0.1.0"
-source = "git+https://github.com/Rust-In-Peace-AP/No-Sound-Drone.git#2df3024108a1bffe36edcb2e8e6931ba72310a5e"
+source = "git+https://github.com/Rust-In-Peace-AP/No-Sound-Drone.git#50d3ed8388d2ed04c292621767c6130910e2f8d9"
 dependencies = [
  "crossbeam-channel",
  "rand 0.8.5",
@@ -276,7 +276,7 @@ dependencies = [
 [[package]]
 name = "ap2024_unitn_cppenjoyers_webservers"
 version = "0.1.0"
-source = "git+https://github.com/Cpp-enjoyers/Text_Media_server#55ca95d2faca4105ec15325b40e1f166a583c634"
+source = "git+https://github.com/Cpp-enjoyers/Text_Media_server#a64866cf9a830881adc1e395a8059e664a1861e2"
 dependencies = [
  "ap2024_unitn_cppenjoyers_drone",
  "bincode",
@@ -776,7 +776,7 @@ dependencies = [
 [[package]]
 name = "chat_common"
 version = "0.1.0"
-source = "git+https://github.com/Cpp-enjoyers/chat_common.git#9d08c4d0e269bf740b2d88846615188a46fc97b3"
+source = "git+https://github.com/Cpp-enjoyers/chat_common.git#87bcb547b8ae0c591b6dd84fbec367b53d05b527"
 dependencies = [
  "common",
  "crossbeam",
@@ -790,11 +790,12 @@ dependencies = [
 [[package]]
 name = "chat_server_client"
 version = "0.1.0"
-source = "git+https://github.com/Cpp-enjoyers/chat_client_server.git#d2b1a1f3c766d8c7fe9799877ac17973aeea8d29"
+source = "git+https://github.com/Cpp-enjoyers/chat_client_server.git#9af2e2bd0d590c293c7ee302005f3bfa2d97ba56"
 dependencies = [
  "chat_common",
  "common",
  "crossbeam",
+ "itertools 0.13.0",
  "wg_2024",
 ]
 
@@ -853,7 +854,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "117725a109d387c937a1533ce01b450cbde6b88abceea8473c4d7a85853cda3c"
 dependencies = [
  "lazy_static",
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -882,7 +883,7 @@ dependencies = [
 [[package]]
 name = "compression"
 version = "0.1.0"
-source = "git+https://github.com/Cpp-enjoyers/compression_lib.git#17ced53e3b9bf3d86a2db25eb660b211760ca2af"
+source = "git+https://github.com/Cpp-enjoyers/compression_lib.git#222160d728334fc6cf83285e1ce607dca9e232b8"
 dependencies = [
  "bit-vec",
  "itertools 0.14.0",
@@ -1449,7 +1450,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "33d852cb9b869c2a9b3df2f71a3074817f01e1844f839a144f5fcef059a4eb5d"
 dependencies = [
  "libc",
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -2406,7 +2407,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fc2f4eb4bc735547cfed7c0a4922cbd04a4655978c09b54f1f7b228750664c34"
 dependencies = [
  "cfg-if",
- "windows-targets 0.48.5",
+ "windows-targets 0.52.6",
 ]
 
 [[package]]
@@ -3616,7 +3617,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys",
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -3817,7 +3818,7 @@ checksum = "d66dc143e6b11c1eddc06d5c423cfc97062865baf299914ab64caa38182078fe"
 [[package]]
 name = "simulation_controller"
 version = "0.1.0"
-source = "git+https://github.com/Cpp-enjoyers/simulation-controller.git#b108ece61d2c78f2fc44a8f6ea4ccdd2d828ddc7"
+source = "git+https://github.com/Cpp-enjoyers/simulation-controller.git#9c8fca705e31c4d33179beea97e81c7d3c364cc8"
 dependencies = [
  "ap2024_unitn_cppenjoyers_drone",
  "common",
@@ -4008,7 +4009,7 @@ dependencies = [
  "getrandom 0.3.1",
  "once_cell",
  "rustix",
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -4632,7 +4633,7 @@ dependencies = [
 [[package]]
 name = "web_client"
 version = "0.1.0"
-source = "git+https://github.com/Cpp-enjoyers/web_client#f6ccc21f28150f7539e77f92e71947000904f3bf"
+source = "git+https://github.com/Cpp-enjoyers/web_client#70dcd489aabe32e164a3fb3a067cbd7120ebfe14"
 dependencies = [
  "bincode",
  "common",
@@ -4861,7 +4862,7 @@ version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cf221c93e13a30d793f7645a0e7762c55d169dbb0a49671918a2319d289b10bb"
 dependencies = [
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
