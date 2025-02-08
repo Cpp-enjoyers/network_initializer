@@ -31,10 +31,42 @@ use wg_2024::packet::Packet;
 #[cfg(test)]
 mod test;
 
-type DroneChannels = HashMap<NodeId, (Sender<DroneCommand>, Receiver<DroneEvent>, Sender<Packet>, Receiver<Packet>)>;
-type WebClientChannels = HashMap<NodeId, (Sender<WebClientCommand>, Receiver<WebClientEvent>, Sender<Packet>, Receiver<Packet>)>;
-type ChatClientChannels = HashMap<NodeId, (Sender<ChatClientCommand>, Receiver<ChatClientEvent>, Sender<Packet>, Receiver<Packet>)>;
-type ServerChannels = HashMap<NodeId, (Sender<ServerCommand>, Receiver<ServerEvent>, Sender<Packet>, Receiver<Packet>)>;
+type DroneChannels = HashMap<
+    NodeId,
+    (
+        Sender<DroneCommand>,
+        Receiver<DroneEvent>,
+        Sender<Packet>,
+        Receiver<Packet>,
+    ),
+>;
+type WebClientChannels = HashMap<
+    NodeId,
+    (
+        Sender<WebClientCommand>,
+        Receiver<WebClientEvent>,
+        Sender<Packet>,
+        Receiver<Packet>,
+    ),
+>;
+type ChatClientChannels = HashMap<
+    NodeId,
+    (
+        Sender<ChatClientCommand>,
+        Receiver<ChatClientEvent>,
+        Sender<Packet>,
+        Receiver<Packet>,
+    ),
+>;
+type ServerChannels = HashMap<
+    NodeId,
+    (
+        Sender<ServerCommand>,
+        Receiver<ServerEvent>,
+        Sender<Packet>,
+        Receiver<Packet>,
+    ),
+>;
 
 macro_rules! create_boxed {
     ($type:ty) => {
@@ -75,29 +107,33 @@ fn create_channels<'a, T>(
     ]
 }
 
+/// checks the uniqueness of each ID
 fn check_id_repetitions(
-    drones_id: &Vec<NodeId>,
-    clients_id: &Vec<NodeId>,
-    servers_id: &Vec<NodeId>,
+    drones_id: &[NodeId],
+    clients_id: &[NodeId],
+    servers_id: &[NodeId],
 ) -> bool {
-    [drones_id.clone(), clients_id.clone(), servers_id.clone()]
+    [drones_id, clients_id, servers_id]
         .concat()
         .iter()
         .all_unique()
 }
 
-fn check_pdr(drones: &Vec<Drone>) -> bool {
+/// checks that every PDR is in [0, 1]
+fn check_pdr(drones: &[Drone]) -> bool {
     drones.iter().all(|d| (0.0..=1.0).contains(&d.pdr))
 }
 
-fn check_drone_connections(drones: &Vec<Drone>) -> bool {
+/// checks drone connections requirements according to WG
+fn check_drone_connections(drones: &[Drone]) -> bool {
     drones.iter().all(|drone| {
         !drone.connected_node_ids.contains(&drone.id)
             && drone.connected_node_ids.iter().all_unique()
     })
 }
 
-fn check_client_connections(clients: &Vec<Client>, drones_id: &Vec<NodeId>) -> bool {
+/// checks client connections requirements according to WG
+fn check_client_connections(clients: &[Client], drones_id: &[NodeId]) -> bool {
     clients.iter().all(|client| {
         !client.connected_drone_ids.contains(&client.id)
             && client.connected_drone_ids.iter().all_unique()
@@ -110,7 +146,8 @@ fn check_client_connections(clients: &Vec<Client>, drones_id: &Vec<NodeId>) -> b
     })
 }
 
-fn check_server_connections(servers: &Vec<Server>, drones_id: &Vec<NodeId>) -> bool {
+/// checks servers connections requirements according to WG
+fn check_server_connections(servers: &[Server], drones_id: &[NodeId]) -> bool {
     servers.iter().all(|server| {
         !server.connected_drone_ids.contains(&server.id)
             && server.connected_drone_ids.iter().all_unique()
@@ -122,10 +159,11 @@ fn check_server_connections(servers: &Vec<Server>, drones_id: &Vec<NodeId>) -> b
     })
 }
 
+/// check that the topology is a bidirectional and connected graph
 fn check_bidirectional_and_connected(
-    drones: &Vec<Drone>,
-    clients: &Vec<Client>,
-    servers: &Vec<Server>,
+    drones: &[Drone],
+    clients: &[Client],
+    servers: &[Server],
 ) -> bool {
     let mut out = vec![drones[0].id];
     let mut queue: VecDeque<(u8, u8)> = VecDeque::new();
@@ -175,7 +213,8 @@ fn check_bidirectional_and_connected(
     out.len() == drones.len() + clients.len() + servers.len()
 }
 
-fn check_connected_only_drones(drones: &Vec<Drone>, drones_is: &Vec<NodeId>) -> bool {
+/// checks that client/server are leaves of the network accoring to WG requirememts
+fn check_connected_only_drones(drones: &[Drone], drones_is: &[NodeId]) -> bool {
     let only_drones: Vec<Drone> = drones
         .iter()
         .map(|d| Drone {
@@ -190,7 +229,7 @@ fn check_connected_only_drones(drones: &Vec<Drone>, drones_is: &Vec<NodeId>) -> 
         })
         .collect();
 
-    check_bidirectional_and_connected(&only_drones, &vec![], &vec![])
+    check_bidirectional_and_connected(&only_drones, &[], &[])
 }
 
 fn main() {
