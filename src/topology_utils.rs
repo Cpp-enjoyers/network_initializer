@@ -102,13 +102,12 @@ pub(super) fn check_topology_constraints(
 
     let graph_init: Vec<(u8, u8, u8)> = drones
         .iter()
-        .map(|d1| {
+        .flat_map(|d1| {
             d1.connected_node_ids
                 .iter()
                 .map(|&d2| (d1.id, d2, 1))
                 .collect::<Vec<(u8, u8, u8)>>()
         })
-        .flatten()
         .collect();
     let mut graph: DiGraphMap<NodeId, u8> = DiGraphMap::from_iter(graph_init);
     let components: usize = connected_components(&graph);
