@@ -1,27 +1,49 @@
-use std::{fs, iter::repeat_with, thread::{self, sleep}, time::Duration, vec};
+use std::{
+    fs,
+    iter::repeat_with,
+    thread::{self, sleep},
+    time::Duration,
+    vec,
+};
 
-use ap2024_unitn_cppenjoyers_webservers::{servers::{Media, Text}, GenericServer};
-use common::{slc_commands::{ServerCommand, ServerEvent, TextMediaResponse, WebClientCommand, WebClientEvent}, Client, Server};
+use ap2024_unitn_cppenjoyers_webservers::{
+    servers::{Media, Text},
+    GenericServer,
+};
+use common::{
+    slc_commands::{
+        ServerCommand, ServerEvent, TextMediaResponse, WebClientCommand, WebClientEvent,
+    },
+    Client, Server,
+};
 use crossbeam_channel::{Receiver, Sender};
 use rand::{thread_rng, Rng};
 use web_client::web_client::WebBrowser;
-use wg_2024::{config::{Client as ClientConfig, Config, Drone as DroneConfig, Server as ServerConfig}, controller::{DroneCommand, DroneEvent}, drone::Drone as DroneTrait, packet::Packet};
-
-use crate::{
-    check_bidirectional_and_connected, check_client_connections, check_connected_only_drones,
-    check_drone_connections, check_id_repetitions, check_pdr, check_server_connections, check_topology_constraints,
+use wg_2024::{
+    config::{Client as ClientConfig, Config, Drone as DroneConfig, Server as ServerConfig},
+    controller::{DroneCommand, DroneEvent},
+    drone::Drone as DroneTrait,
+    packet::Packet,
 };
 
+use ap2024_rustinpeace_nosounddrone::NoSoundDroneRIP;
 use dr_ones::Drone as DrDrone;
 use drone_bettercalldrone::BetterCallDrone;
 use getdroned::GetDroned;
-use ap2024_rustinpeace_nosounddrone::NoSoundDroneRIP;
 use rolling_drone::RollingDrone;
 use rust_do_it::RustDoIt;
 use rust_roveri::RustRoveri;
 use rustafarian_drone::RustafarianDrone;
 use rusteze_drone::RustezeDrone;
 use rusty_drones::RustyDrone;
+
+use crate::{
+    check_topology_constraints,
+    topology_utils::{
+        check_client_connections, check_drone_connections, check_id_repetitions, check_pdr,
+        check_server_connections,
+    },
+};
 
 fn correct_config() -> Config {
     Config {
@@ -332,43 +354,7 @@ fn test_check_server_connections() {
 }
 
 #[test]
-fn test_bidirectional_and_connected() {
-    let Config {
-        drone,
-        mut client,
-        server,
-    } = correct_config();
-
-    assert!(check_bidirectional_and_connected(&drone, &client, &server));
-
-    client.push(ClientConfig {
-        id: 34,
-        connected_drone_ids: vec![],
-    });
-    assert!(!check_bidirectional_and_connected(&drone, &client, &server));
-
-    client.pop();
-    client[0].connected_drone_ids.pop();
-    assert!(!check_bidirectional_and_connected(&drone, &client, &server));
-}
-
-#[test]
-fn test_connected_only_drones() {
-    let Config { mut drone, .. } = correct_config();
-
-    let drones_id: Vec<u8> = drone.iter().map(|drone| drone.id).collect();
-
-    assert!(check_connected_only_drones(&drone, &drones_id));
-
-    drone[0].connected_node_ids[1] = 10;
-    assert!(!check_connected_only_drones(&drone, &drones_id));
-
-    drone[0].connected_node_ids.pop();
-    assert!(!check_connected_only_drones(&drone, &drones_id));
-}
-
-#[test]
-fn double_chain(){
+fn double_chain() {
     let config_data: String =
         fs::read_to_string("config/double_chain.toml").expect("Unable to read config file");
     // having our structs implement the Deserialize trait allows us to use the toml::from_str function to deserialize the config file into each of them
@@ -379,11 +365,10 @@ fn double_chain(){
     }: Config = toml::from_str(&config_data).expect("Unable to parse TOML");
 
     assert!(check_topology_constraints(&drone, &client, &server));
-
 }
 
 #[test]
-fn tree(){
+fn tree() {
     let config_data: String =
         fs::read_to_string("config/tree.toml").expect("Unable to read config file");
     // having our structs implement the Deserialize trait allows us to use the toml::from_str function to deserialize the config file into each of them
@@ -394,11 +379,10 @@ fn tree(){
     }: Config = toml::from_str(&config_data).expect("Unable to parse TOML");
 
     assert!(check_topology_constraints(&drone, &client, &server));
-
 }
 
 #[test]
-fn subnet1(){
+fn subnet1() {
     let config_data: String =
         fs::read_to_string("config/sub_net_1.toml").expect("Unable to read config file");
     // having our structs implement the Deserialize trait allows us to use the toml::from_str function to deserialize the config file into each of them
@@ -412,7 +396,7 @@ fn subnet1(){
 }
 
 #[test]
-fn subnet2(){
+fn subnet2() {
     let config_data: String =
         fs::read_to_string("config/sub_net_2.toml").expect("Unable to read config file");
     // having our structs implement the Deserialize trait allows us to use the toml::from_str function to deserialize the config file into each of them
@@ -426,7 +410,7 @@ fn subnet2(){
 }
 
 #[test]
-fn star(){
+fn star() {
     let config_data: String =
         fs::read_to_string("config/star.toml").expect("Unable to read config file");
     // having our structs implement the Deserialize trait allows us to use the toml::from_str function to deserialize the config file into each of them
@@ -437,11 +421,10 @@ fn star(){
     }: Config = toml::from_str(&config_data).expect("Unable to parse TOML");
 
     assert!(check_topology_constraints(&drone, &client, &server));
-
 }
 
 #[test]
-fn butterfly(){
+fn butterfly() {
     let config_data: String =
         fs::read_to_string("config/butterfly.toml").expect("Unable to read config file");
     // having our structs implement the Deserialize trait allows us to use the toml::from_str function to deserialize the config file into each of them
@@ -452,13 +435,12 @@ fn butterfly(){
     }: Config = toml::from_str(&config_data).expect("Unable to parse TOML");
 
     assert!(check_topology_constraints(&drone, &client, &server));
-
 }
 
 #[test]
-fn test_drdrone(){
+fn test_drdrone() {
     let (_dcmds, devents, stctrl, _stevents, smctrl, _smevents, cctrl, cevents) =
-            instanciate_testing_topology::<DrDrone>();
+        instanciate_testing_topology::<DrDrone>();
     generic_full_file_request(
         devents,
         stctrl,
@@ -474,9 +456,9 @@ fn test_drdrone(){
 }
 
 #[test]
-fn test_bettercalldrone(){
+fn test_bettercalldrone() {
     let (_dcmds, devents, stctrl, _stevents, smctrl, _smevents, cctrl, cevents) =
-            instanciate_testing_topology::<BetterCallDrone>();
+        instanciate_testing_topology::<BetterCallDrone>();
     generic_full_file_request(
         devents,
         stctrl,
@@ -492,9 +474,9 @@ fn test_bettercalldrone(){
 }
 
 #[test]
-fn test_getdroned(){
+fn test_getdroned() {
     let (_dcmds, devents, stctrl, _stevents, smctrl, _smevents, cctrl, cevents) =
-            instanciate_testing_topology::<GetDroned>();
+        instanciate_testing_topology::<GetDroned>();
     generic_full_file_request(
         devents,
         stctrl,
@@ -510,9 +492,9 @@ fn test_getdroned(){
 }
 
 #[test]
-fn test_rustinpeace(){
+fn test_rustinpeace() {
     let (_dcmds, devents, stctrl, _stevents, smctrl, _smevents, cctrl, cevents) =
-            instanciate_testing_topology::<NoSoundDroneRIP>();
+        instanciate_testing_topology::<NoSoundDroneRIP>();
     generic_full_file_request(
         devents,
         stctrl,
@@ -528,9 +510,9 @@ fn test_rustinpeace(){
 }
 
 #[test]
-fn test_rollingdrone(){
+fn test_rollingdrone() {
     let (_dcmds, devents, stctrl, _stevents, smctrl, _smevents, cctrl, cevents) =
-            instanciate_testing_topology::<RollingDrone>();
+        instanciate_testing_topology::<RollingDrone>();
     generic_full_file_request(
         devents,
         stctrl,
@@ -546,9 +528,9 @@ fn test_rollingdrone(){
 }
 
 #[test]
-fn test_rustdoit(){
+fn test_rustdoit() {
     let (_dcmds, devents, stctrl, _stevents, smctrl, _smevents, cctrl, cevents) =
-            instanciate_testing_topology::<RustDoIt>();
+        instanciate_testing_topology::<RustDoIt>();
     generic_full_file_request(
         devents,
         stctrl,
@@ -564,9 +546,9 @@ fn test_rustdoit(){
 }
 
 #[test]
-fn test_rustroveri(){
+fn test_rustroveri() {
     let (_dcmds, devents, stctrl, _stevents, smctrl, _smevents, cctrl, cevents) =
-            instanciate_testing_topology::<RustRoveri>();
+        instanciate_testing_topology::<RustRoveri>();
     generic_full_file_request(
         devents,
         stctrl,
@@ -582,9 +564,9 @@ fn test_rustroveri(){
 }
 
 #[test]
-fn test_rustafarian(){
+fn test_rustafarian() {
     let (_dcmds, devents, stctrl, _stevents, smctrl, _smevents, cctrl, cevents) =
-            instanciate_testing_topology::<RustafarianDrone>();
+        instanciate_testing_topology::<RustafarianDrone>();
     generic_full_file_request(
         devents,
         stctrl,
@@ -600,9 +582,9 @@ fn test_rustafarian(){
 }
 
 #[test]
-fn test_rusteze(){
+fn test_rusteze() {
     let (_dcmds, devents, stctrl, _stevents, smctrl, _smevents, cctrl, cevents) =
-            instanciate_testing_topology::<RustezeDrone>();
+        instanciate_testing_topology::<RustezeDrone>();
     generic_full_file_request(
         devents,
         stctrl,
@@ -618,9 +600,9 @@ fn test_rusteze(){
 }
 
 #[test]
-fn test_rustydrone(){
+fn test_rustydrone() {
     let (_dcmds, devents, stctrl, _stevents, smctrl, _smevents, cctrl, cevents) =
-            instanciate_testing_topology::<RustyDrone>();
+        instanciate_testing_topology::<RustyDrone>();
     generic_full_file_request(
         devents,
         stctrl,

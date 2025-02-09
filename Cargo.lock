@@ -276,7 +276,7 @@ dependencies = [
 [[package]]
 name = "ap2024_unitn_cppenjoyers_webservers"
 version = "0.1.0"
-source = "git+https://github.com/Cpp-enjoyers/Text_Media_server#a64866cf9a830881adc1e395a8059e664a1861e2"
+source = "git+https://github.com/Cpp-enjoyers/Text_Media_server#e9171db77f64e6dde0770ca34f51d5db596683ba"
 dependencies = [
  "ap2024_unitn_cppenjoyers_drone",
  "bincode",
@@ -782,11 +782,12 @@ dependencies = [
 [[package]]
 name = "chat_common"
 version = "0.1.0"
-source = "git+https://github.com/Cpp-enjoyers/chat_common.git#62171dcfc56cda64225fdfdd8862e33ee98ba43c"
+source = "git+https://github.com/Cpp-enjoyers/chat_common.git#b62d8a8f93d20d127e4d60554f9f87b3ca32a43e"
 dependencies = [
  "common",
  "crossbeam",
  "itertools 0.14.0",
+ "log",
  "petgraph 0.7.1",
  "prost",
  "prost-build",
@@ -796,7 +797,7 @@ dependencies = [
 [[package]]
 name = "chat_server_client"
 version = "0.1.0"
-source = "git+https://github.com/Cpp-enjoyers/chat_client_server.git#dc7329b2a4a69abdf69c6fb5dcdc06897c4516f0"
+source = "git+https://github.com/Cpp-enjoyers/chat_client_server.git#fdccc4cb9139a9efcb30fa7043b235e7fbf6c76a"
 dependencies = [
  "bimap",
  "chat_common",
@@ -804,6 +805,7 @@ dependencies = [
  "common",
  "crossbeam",
  "itertools 0.14.0",
+ "log",
  "map-macro",
  "rand 0.9.0",
  "wg_2024",
@@ -880,7 +882,7 @@ dependencies = [
 [[package]]
 name = "common"
 version = "0.1.0"
-source = "git+https://github.com/Cpp-enjoyers/common.git#8ea1de22be4b1e0b3f98c7533dec17e2a10013d8"
+source = "git+https://github.com/Cpp-enjoyers/common.git#f91537858ed174f8b2465a441595634f1e288cf0"
 dependencies = [
  "bincode",
  "crossbeam-channel",
@@ -1074,9 +1076,9 @@ checksum = "96a6ac251f4a2aca6b3f91340350eab87ae57c3f127ffeb585e92bd336717991"
 
 [[package]]
 name = "data-encoding"
-version = "2.7.0"
+version = "2.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0e60eed09d8c01d3cee5b7d30acb059b76614c918fa0f992e0dd6eeb10daad6f"
+checksum = "575f75dfd25738df5b91b8e43e14d44bda14637a58fae779fd2b064f8bf3e010"
 
 [[package]]
 name = "derive_more"
@@ -1149,7 +1151,7 @@ checksum = "f25c0e292a7ca6d6498557ff1df68f32c99850012b6ea401cf8daf771f22ff53"
 [[package]]
 name = "dr_ones"
 version = "0.1.0"
-source = "git+https://github.com/Dr-Ones/drone#810a4409d02d1b3e58ffe67861ce9931e5a095e1"
+source = "git+https://github.com/Dr-Ones/drone#30102d8c1d2d707e8e1216443d73d89b369cdd72"
 dependencies = [
  "crossbeam-channel",
  "network_node",
@@ -2717,7 +2719,7 @@ dependencies = [
 [[package]]
 name = "network_node"
 version = "0.1.0"
-source = "git+https://github.com/Dr-Ones/common.git#b2bcd21bacb5099e7f75dd8dea5303f20568c4e0"
+source = "git+https://github.com/Dr-Ones/common.git#5478bcf94f34b56bfb4d979fede70a93d71ab0fd"
 dependencies = [
  "chrono",
  "crossbeam-channel",
@@ -3534,7 +3536,7 @@ checksum = "19b30a45b0cd0bcca8037f3d0dc3421eaf95327a17cad11964fb8179b4fc4832"
 [[package]]
 name = "rolling_drone"
 version = "0.1.0"
-source = "git+https://github.com/giorebecchi/RollingDrone.git#89aa55ff2f9c65a56c1a683da89f095d4d01f00c"
+source = "git+https://github.com/giorebecchi/RollingDrone.git#b5c9cd6328ba62e026b8accf0701ef9ffd84abdf"
 dependencies = [
  "crossbeam-channel",
  "rand 0.9.0",
@@ -3834,7 +3836,7 @@ checksum = "d66dc143e6b11c1eddc06d5c423cfc97062865baf299914ab64caa38182078fe"
 [[package]]
 name = "simulation_controller"
 version = "0.1.0"
-source = "git+https://github.com/Cpp-enjoyers/simulation-controller.git#9c8fca705e31c4d33179beea97e81c7d3c364cc8"
+source = "git+https://github.com/Cpp-enjoyers/simulation-controller.git#93e28187362fd270f91aca3a7b54e5c30f93370c"
 dependencies = [
  "ap2024_unitn_cppenjoyers_drone",
  "common",
@@ -4649,7 +4651,7 @@ dependencies = [
 [[package]]
 name = "web_client"
 version = "0.1.0"
-source = "git+https://github.com/Cpp-enjoyers/web_client#70dcd489aabe32e164a3fb3a067cbd7120ebfe14"
+source = "git+https://github.com/Cpp-enjoyers/web_client#da8d80a42b5c7216eb396d00ca5cc3affa4ce301"
 dependencies = [
  "bincode",
  "common",
