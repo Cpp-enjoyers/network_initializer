@@ -297,7 +297,7 @@ fn main() {
     ];
 
     let config_data: String =
-        fs::read_to_string("config/test_config.toml").expect("Unable to read config file");
+        fs::read_to_string("config/test_chat_config.toml").expect("Unable to read config file");
     // having our structs implement the Deserialize trait allows us to use the toml::from_str function to deserialize the config file into each of them
     let Config {
         drone,
@@ -323,16 +323,22 @@ fn main() {
         .collect();
 
     // TODO: channels for servers and clients
-    let scl_web_client_events: HashMap<NodeId, (Sender<WebClientEvent>, Receiver<WebClientEvent>)> =
-        client
-            .iter()
-            .map(|c: &Client| (c.id, crossbeam_channel::unbounded()))
-            .collect();
+    let scl_web_client_events: HashMap<NodeId, (Sender<WebClientEvent>, Receiver<WebClientEvent>)> = client
+        .iter()
+        .map(|c: &Client| (c.id, crossbeam_channel::unbounded()))
+        .collect();
 
-    let scl_web_client_commands: HashMap<
-        NodeId,
-        (Sender<WebClientCommand>, Receiver<WebClientCommand>),
-    > = client
+    let scl_web_client_commands: HashMap<NodeId, (Sender<WebClientCommand>, Receiver<WebClientCommand>),> = client
+        .iter()
+        .map(|c: &Client| (c.id, crossbeam_channel::unbounded()))
+        .collect();
+
+    let scl_chat_client_events: HashMap<NodeId, (Sender<ChatClientEvent>, Receiver<ChatClientEvent>)> = client
+        .iter()
+        .map(|c: &Client| (c.id, crossbeam_channel::unbounded()))
+        .collect();
+
+    let scl_chat_client_commands: HashMap<NodeId, (Sender<ChatClientCommand>, Receiver<ChatClientCommand>)> = client
         .iter()
         .map(|c: &Client| (c.id, crossbeam_channel::unbounded()))
         .collect();
@@ -342,11 +348,10 @@ fn main() {
         .map(|s: &Server| (s.id, crossbeam_channel::unbounded()))
         .collect();
 
-    let scl_server_commands: HashMap<NodeId, (Sender<ServerCommand>, Receiver<ServerCommand>)> =
-        server
-            .iter()
-            .map(|s: &Server| (s.id, crossbeam_channel::unbounded()))
-            .collect();
+    let scl_server_commands: HashMap<NodeId, (Sender<ServerCommand>, Receiver<ServerCommand>)> = server
+        .iter()
+        .map(|s: &Server| (s.id, crossbeam_channel::unbounded()))
+        .collect();
 
     let channels: HashMap<NodeId, (Sender<Packet>, Receiver<Packet>)> =
         create_channels(&drone, &client, &server).collect();
@@ -372,7 +377,7 @@ fn main() {
     // TODO spawn client/server + start scl
     let mut scl_drones_channels: DroneChannels = HashMap::new();
     let mut scl_web_clients_channels: WebClientChannels = HashMap::new();
-    let scl_chat_clients_channels: ChatClientChannels = HashMap::new();
+    let mut scl_chat_clients_channels: ChatClientChannels = HashMap::new();
     let mut scl_servers_channels: ServerChannels = HashMap::new();
     for d in &drone {
         scl_drones_channels.insert(
@@ -396,6 +401,17 @@ fn main() {
             ),
         );
     }
+    for c in &client {
+        scl_chat_clients_channels.insert(
+            c.id,
+            (
+                scl_chat_client_commands[&c.id].0.clone(),
+                scl_chat_client_events[&c.id].1.clone(),
+                channels[&c.id].0.clone(),
+                channels[&c.id].1.clone(),
+            ),
+        );
+    }
     for s in &server {
         scl_servers_channels.insert(
             s.id,
@@ -408,7 +424,7 @@ fn main() {
         );
     }
 
-    // spawn clients
+    // spawn web clients
     for c in &client {
         let nbrs: HashMap<NodeId, Sender<Packet>> = c
             .connected_drone_ids
@@ -425,7 +441,24 @@ fn main() {
         std::thread::spawn(move || new_client.run());
     }
 
-    // spawn servers
+    // spawn chat clients
+    // for c in &client {
+    //     let nbrs: HashMap<NodeId, Sender<Packet>> = c
+    //         .connected_drone_ids
+    //         .iter()
+    //         .map(|id: &NodeId| (*id, channels[id].0.clone()))
+    //         .collect();
+    //     let mut new_client = chat_server_client::client::ChatClient::new(
+    //         c.id,
+    //         scl_chat_client_events[&c.id].0.clone(),
+    //         scl_chat_client_commands[&c.id].1.clone(),
+    //         channels[&c.id].1.clone(),
+    //         nbrs,
+    //     );
+    //     std::thread::spawn(move || new_client.run());
+    // }
+
+    // spawn servers (text and media)
     for (idx, s) in server.iter().enumerate() {
         if idx == 0 {
             let nbrs: HashMap<NodeId, Sender<Packet>> = s
@@ -457,6 +490,23 @@ fn main() {
             std::thread::spawn(move || new_server.run());
         }
     }
+
+    // spawn chat server
+    // for s in &server {
+    //     let nbrs: HashMap<NodeId, Sender<Packet>> = s
+    //         .connected_drone_ids
+    //         .iter()
+    //         .map(|id: &NodeId| (*id, channels[id].0.clone()))
+    //         .collect();
+    //     let mut new_server = chat_server_client::server::ChatServer::new(
+    //         s.id,
+    //         scl_server_events[&s.id].0.clone(),
+    //         scl_server_commands[&s.id].1.clone(),
+    //         channels[&s.id].1.clone(),
+    //         nbrs,
+    //     );
+    //     std::thread::spawn(move || new_server.run());
+    // }
 
     simulation_controller::run(
         scl_drones_channels,

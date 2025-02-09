@@ -253,7 +253,7 @@ checksum = "34ac096ce696dc2fcabef30516bb13c0a68a11d30131d3df6f04711467681b04"
 [[package]]
 name = "ap2024_rustinpeace_nosounddrone"
 version = "0.1.0"
-source = "git+https://github.com/Rust-In-Peace-AP/No-Sound-Drone.git#50d3ed8388d2ed04c292621767c6130910e2f8d9"
+source = "git+https://github.com/Rust-In-Peace-AP/No-Sound-Drone.git#5a752ec5f824ca4bbadfb60c13296d54487ff31d"
 dependencies = [
  "crossbeam-channel",
  "rand 0.8.5",
@@ -571,6 +571,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9d297deb1925b89f2ccc13d7635fa0714f12c87adce1c75356b39ca9b7178567"
 
 [[package]]
+name = "bimap"
+version = "0.6.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "230c5f1ca6a325a32553f8640d31ac9b49f2411e901e427570154868b46da4f7"
+
+[[package]]
 name = "bincode"
 version = "2.0.0-rc.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -776,7 +782,7 @@ dependencies = [
 [[package]]
 name = "chat_common"
 version = "0.1.0"
-source = "git+https://github.com/Cpp-enjoyers/chat_common.git#87bcb547b8ae0c591b6dd84fbec367b53d05b527"
+source = "git+https://github.com/Cpp-enjoyers/chat_common.git#62171dcfc56cda64225fdfdd8862e33ee98ba43c"
 dependencies = [
  "common",
  "crossbeam",
@@ -790,12 +796,16 @@ dependencies = [
 [[package]]
 name = "chat_server_client"
 version = "0.1.0"
-source = "git+https://github.com/Cpp-enjoyers/chat_client_server.git#9af2e2bd0d590c293c7ee302005f3bfa2d97ba56"
+source = "git+https://github.com/Cpp-enjoyers/chat_client_server.git#dc7329b2a4a69abdf69c6fb5dcdc06897c4516f0"
 dependencies = [
+ "bimap",
  "chat_common",
+ "chrono",
  "common",
  "crossbeam",
- "itertools 0.13.0",
+ "itertools 0.14.0",
+ "map-macro",
+ "rand 0.9.0",
  "wg_2024",
 ]
 
@@ -2480,6 +2490,12 @@ checksum = "62bb907fe88d54d8d9ce32a3cceab4218ed2f6b7d35617cafe9adf84e43919cb"
 dependencies = [
  "libc",
 ]
+
+[[package]]
+name = "map-macro"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fb950a42259642e5a3483115aca87eebed2a64886993463af9c9739c205b8d3a"
 
 [[package]]
 name = "markup5ever"
