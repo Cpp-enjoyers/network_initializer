@@ -62,7 +62,7 @@ pub(super) fn check_server_connections(servers: &[Server], drones_ids: &[NodeId]
     })
 }
 
-fn check_bidirectional(graph: &DiGraphMap<u8, u8>) -> bool {
+pub(super) fn check_bidirectional(graph: &DiGraphMap<u8, u8>) -> bool {
     for node in graph.nodes() {
         if !graph
             .edges_directed(node, Incoming)

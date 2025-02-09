@@ -17,6 +17,7 @@ use common::{
     Client, Server,
 };
 use crossbeam_channel::{Receiver, Sender};
+use petgraph::prelude::DiGraphMap;
 use rand::{thread_rng, Rng};
 use web_client::web_client::WebBrowser;
 use wg_2024::{
@@ -40,8 +41,7 @@ use rusty_drones::RustyDrone;
 use crate::{
     check_topology_constraints,
     topology_utils::{
-        check_client_connections, check_drone_connections, check_id_repetitions, check_pdr,
-        check_server_connections,
+        check_bidirectional, check_client_connections, check_drone_connections, check_id_repetitions, check_pdr, check_server_connections
     },
 };
 
@@ -365,6 +365,36 @@ fn double_chain() {
     }: Config = toml::from_str(&config_data).expect("Unable to parse TOML");
 
     assert!(check_topology_constraints(&drone, &client, &server));
+}
+
+#[test]
+fn test_graph_checks() {
+    let g1 = DiGraphMap::from_edges([
+        (1, 2, 1),
+        (2, 1, 1),
+        (2, 3, 1),
+        (3, 2, 1),
+    ]);
+    assert!(check_bidirectional(&g1));
+
+    let g2 = DiGraphMap::from_edges([
+        (1, 2, 1),
+        (2, 1, 1),
+        (2, 3, 1),
+        (3, 2, 1),
+        (3, 1, 1),
+    ]);
+    assert!(!check_bidirectional(&g2));
+
+    let g4 = DiGraphMap::from_edges([
+        (1, 2, 1),
+        (2, 1, 1),
+        (2, 3, 1),
+        (3, 2, 1),
+        (3, 1, 1),
+        (3, 5, 1),
+    ]);
+    assert!(!check_bidirectional(&g4));
 }
 
 #[test]
