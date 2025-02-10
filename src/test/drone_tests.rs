@@ -124,7 +124,6 @@ fn test_rustdoit() {
 
 #[test]
 fn test_rustroveri() {
-
     let (_dcmds, devents, stctrl, _stevents, smctrl, _smevents, cctrl, cevents) =
         instanciate_testing_topology::<RustRoveri>();
     generic_full_file_request(
