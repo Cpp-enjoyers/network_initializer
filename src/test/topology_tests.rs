@@ -1,4 +1,4 @@
-use std::{env, fs};
+use std::fs;
 use wg_2024::config::Config;
 
 use crate::check_topology_constraints;

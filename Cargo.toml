@@ -28,7 +28,6 @@ wg_2024 = { git = "https://github.com/WGL-2024/WGL_repo_2024.git", features = ["
 itertools = "0.14.0"
 web_client = {git = "https://github.com/Cpp-enjoyers/web_client"}
 ap2024_unitn_cppenjoyers_webservers = {git = "https://github.com/Cpp-enjoyers/Text_Media_server"}
-chat_common = {git = "https://github.com/Cpp-enjoyers/chat_common.git"}
 chat_server_client = { git = "https://github.com/Cpp-enjoyers/chat_client_server.git" }
 rand = "0.5"
 petgraph = "0.7"

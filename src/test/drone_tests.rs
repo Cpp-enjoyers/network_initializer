@@ -1,4 +1,4 @@
-use std::{env, fs};
+use std::fs;
 
 use ap2024_rustinpeace_nosounddrone::NoSoundDroneRIP;
 use common::slc_commands::TextMediaResponse;

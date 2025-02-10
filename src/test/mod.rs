@@ -3,8 +3,8 @@ use std::{
 };
 
 use ap2024_unitn_cppenjoyers_webservers::{
-    servers::{Media, ServerType, Text},
-    GenericServer, TextServer,
+    servers::{Media, Text},
+    GenericServer,
 };
 use common::{
     slc_commands::{
