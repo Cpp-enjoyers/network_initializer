@@ -1,4 +1,4 @@
-use std::fs;
+use std::{env, fs};
 use wg_2024::config::Config;
 
 use crate::check_topology_constraints;
@@ -61,6 +61,8 @@ fn subnet2() {
 
 #[test]
 fn star() {
+    // env::set_var("RUST_LOG", "info");
+    // env_logger::init();
     let config_data: String =
         fs::read_to_string("config/star.toml").expect("Unable to read config file");
     // having our structs implement the Deserialize trait allows us to use the toml::from_str function to deserialize the config file into each of them
