@@ -1,4 +1,4 @@
-use std::fs;
+use std::{env, fs};
 
 use ap2024_rustinpeace_nosounddrone::NoSoundDroneRIP;
 use common::slc_commands::TextMediaResponse;
@@ -124,6 +124,7 @@ fn test_rustdoit() {
 
 #[test]
 fn test_rustroveri() {
+
     let (_dcmds, devents, stctrl, _stevents, smctrl, _smevents, cctrl, cevents) =
         instanciate_testing_topology::<RustRoveri>();
     generic_full_file_request(

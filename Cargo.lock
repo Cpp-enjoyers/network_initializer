@@ -782,7 +782,7 @@ dependencies = [
 [[package]]
 name = "chat_common"
 version = "0.1.0"
-source = "git+https://github.com/Cpp-enjoyers/chat_common.git#b62d8a8f93d20d127e4d60554f9f87b3ca32a43e"
+source = "git+https://github.com/Cpp-enjoyers/chat_common.git#7c2fc99257044dbf91c9df9d4a4841de1e5b1a95"
 dependencies = [
  "common",
  "crossbeam",
@@ -797,7 +797,7 @@ dependencies = [
 [[package]]
 name = "chat_server_client"
 version = "0.1.0"
-source = "git+https://github.com/Cpp-enjoyers/chat_client_server.git#fdccc4cb9139a9efcb30fa7043b235e7fbf6c76a"
+source = "git+https://github.com/Cpp-enjoyers/chat_client_server.git#bd09691676900214b4cfae26a5f440712af658f8"
 dependencies = [
  "bimap",
  "chat_common",
@@ -4651,7 +4651,7 @@ dependencies = [
 [[package]]
 name = "web_client"
 version = "0.1.0"
-source = "git+https://github.com/Cpp-enjoyers/web_client#da8d80a42b5c7216eb396d00ca5cc3affa4ce301"
+source = "git+https://github.com/Cpp-enjoyers/web_client#22ac348f3a21aebeeaca8a8525d51699dad6d7d5"
 dependencies = [
  "bincode",
  "common",
