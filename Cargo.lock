@@ -4650,7 +4650,7 @@ dependencies = [
 [[package]]
 name = "web_client"
 version = "0.1.0"
-source = "git+https://github.com/Cpp-enjoyers/web_client#22ac348f3a21aebeeaca8a8525d51699dad6d7d5"
+source = "git+https://github.com/Cpp-enjoyers/web_client#08cfb05cea3f814d06daab7061f088fc968ae67b"
 dependencies = [
  "bincode",
  "common",

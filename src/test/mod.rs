@@ -1,5 +1,9 @@
 use std::{
-    collections::HashMap, iter::repeat_with, thread::{self, sleep}, time::Duration, vec
+    collections::HashMap,
+    iter::repeat_with,
+    thread::{self, sleep},
+    time::Duration,
+    vec,
 };
 
 use ap2024_unitn_cppenjoyers_webservers::{
@@ -8,7 +12,7 @@ use ap2024_unitn_cppenjoyers_webservers::{
 };
 use common::{
     slc_commands::{
-        self, ServerCommand, ServerEvent, TextMediaResponse, WebClientCommand, WebClientEvent
+        self, ServerCommand, ServerEvent, TextMediaResponse, WebClientCommand, WebClientEvent,
     },
     Client, Server,
 };
@@ -222,11 +226,14 @@ fn generic_full_file_request(
                     break;
                 }
                 WebClientEvent::ServersTypes(list) => {
-                    if list == HashMap::from([(11, slc_commands::ServerType::FileServer), (13, slc_commands::ServerType::MediaServer)]){
+                    if list
+                        == HashMap::from([
+                            (11, slc_commands::ServerType::FileServer),
+                            (13, slc_commands::ServerType::MediaServer),
+                        ])
+                    {
                         let _ = cctrl.send(WebClientCommand::AskListOfFiles(11));
-
                     }
-
                 }
                 WebClientEvent::ListOfFiles(_, _) => {
                     let _ = cctrl.send(WebClientCommand::RequestFile(file.clone(), 11));
