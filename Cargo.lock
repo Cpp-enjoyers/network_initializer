@@ -276,7 +276,7 @@ dependencies = [
 [[package]]
 name = "ap2024_unitn_cppenjoyers_webservers"
 version = "0.1.0"
-source = "git+https://github.com/Cpp-enjoyers/Text_Media_server#e9171db77f64e6dde0770ca34f51d5db596683ba"
+source = "git+https://github.com/Cpp-enjoyers/Text_Media_server#c274955baccb5a354adf2f7e2cc49d81beb117b5"
 dependencies = [
  "ap2024_unitn_cppenjoyers_drone",
  "bincode",
@@ -782,7 +782,7 @@ dependencies = [
 [[package]]
 name = "chat_common"
 version = "0.1.0"
-source = "git+https://github.com/Cpp-enjoyers/chat_common.git#7c2fc99257044dbf91c9df9d4a4841de1e5b1a95"
+source = "git+https://github.com/Cpp-enjoyers/chat_common.git#14881b02fb2eec1e2b7c748292f104ba3add85ac"
 dependencies = [
  "common",
  "crossbeam",
@@ -797,7 +797,7 @@ dependencies = [
 [[package]]
 name = "chat_server_client"
 version = "0.1.0"
-source = "git+https://github.com/Cpp-enjoyers/chat_client_server.git#bd09691676900214b4cfae26a5f440712af658f8"
+source = "git+https://github.com/Cpp-enjoyers/chat_client_server.git#402fb3eabe22eff16328e4aa64bd22b5ec65c7fd"
 dependencies = [
  "bimap",
  "chat_common",
@@ -3646,7 +3646,7 @@ checksum = "f7c45b9784283f1b2e7fb61b42047c2fd678ef0960d4f6f1eba131594cc369d4"
 [[package]]
 name = "rusty_drones"
 version = "0.0.0"
-source = "git+https://github.com/rusty-drone-2024/rusty-drone.git#92e7227593ae3a3c7ad84b57f929ffb709686ea8"
+source = "git+https://github.com/rusty-drone-2024/rusty-drone.git#81aff862f2a0f43166ef1f86130d1d144a5cb4bc"
 dependencies = [
  "crossbeam-channel",
  "rand 0.9.0",
@@ -3835,15 +3835,26 @@ checksum = "d66dc143e6b11c1eddc06d5c423cfc97062865baf299914ab64caa38182078fe"
 [[package]]
 name = "simulation_controller"
 version = "0.1.0"
-source = "git+https://github.com/Cpp-enjoyers/simulation-controller.git#93e28187362fd270f91aca3a7b54e5c30f93370c"
+source = "git+https://github.com/Cpp-enjoyers/simulation-controller.git#8d6d908acecbb9885ce310cb4f97d4992b6a7c68"
 dependencies = [
+ "ap2024_rustinpeace_nosounddrone",
  "ap2024_unitn_cppenjoyers_drone",
  "common",
  "crossbeam-channel",
+ "dr_ones",
+ "drone_bettercalldrone",
  "eframe",
  "egui",
  "egui_graphs",
+ "getdroned",
  "petgraph 0.6.5",
+ "rand 0.9.0",
+ "rolling_drone",
+ "rust-roveri",
+ "rust_do_it",
+ "rustafarian-drone",
+ "rusteze_drone",
+ "rusty_drones",
  "scraper",
  "tempfile",
  "webbrowser",
@@ -4201,9 +4212,9 @@ dependencies = [
 
 [[package]]
 name = "toml_edit"
-version = "0.22.23"
+version = "0.22.24"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "02a8b472d1a3d7c18e2d61a489aee3453fd9031c33e4f55bd533f4a7adca1bee"
+checksum = "17b4795ff5edd201c7cd6dca065ae59972ce77d1b80fa0a84d94950ece7d1474"
 dependencies = [
  "indexmap",
  "serde",
@@ -4650,7 +4661,7 @@ dependencies = [
 [[package]]
 name = "web_client"
 version = "0.1.0"
-source = "git+https://github.com/Cpp-enjoyers/web_client#08cfb05cea3f814d06daab7061f088fc968ae67b"
+source = "git+https://github.com/Cpp-enjoyers/web_client#cb06d8812a62e007ed8fb783714c74d7098826b2"
 dependencies = [
  "bincode",
  "common",
@@ -5220,9 +5231,9 @@ dependencies = [
 
 [[package]]
 name = "winnow"
-version = "0.7.1"
+version = "0.7.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "86e376c75f4f43f44db463cf729e0d3acbf954d13e22c51e26e4c264b4ab545f"
+checksum = "59690dea168f2198d1a3b0cac23b8063efcd11012f10ae4698f284808c8ef603"
 dependencies = [
  "memchr",
 ]
